@@ -1,0 +1,42 @@
+<dom-module id="shared-styles">
+    <template>
+        <style>
+         :root {
+             --normal-color : #b1f599;
+             --accent-color : #00cc55;
+             --background-color: #f0fff0;
+
+             --paper-tabs  {
+                 --paper-tabs-selection-bar-color : var(--accent-color);
+                 --paper-tab-ink : var(--accent-color);
+             }
+         } 
+
+         
+         .l1 {
+             background-color : var(--normal-color);                 
+             height: 30px;
+         }
+
+         .l2 {
+             background-color : var(--background-color);
+             padding: 5px;
+         }
+
+         .l2_button {
+             background : white;
+         }
+
+         .toast {
+         }
+         
+         .toast_bad {
+             --paper-toast-background-color: red
+         }
+         
+         .toast_good {
+             --paper-toast-background-color: green
+         }
+        </style>
+    </template>
+</dom-module>

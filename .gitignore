@@ -1,0 +1,19 @@
+*~
+*\#
+*.orig
+*v8.log
+*.tern-project
+*yas.js
+*npm-debug.log*
+
+#project related files
+cp.sh
+assets/
+src/js/lib
+node_modules/
+npp
+npm-debug.log
+npm-debug.log
+config/database.js
+scripts/raw/*
+*.tern-port
