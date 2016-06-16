@@ -10,9 +10,11 @@ viewer.scene;
 
 viewer.tagMode = false;
 
+viewer.iwcClient;
+
 viewer.init = function (model) {
   var me = this;
-  
+
   $(function () {
     me.elem = $('#elem');
     me.inline = $('#inline');
@@ -20,6 +22,31 @@ viewer.init = function (model) {
     me.elem[0].addEventListener("mousemove", me.handleOrientation, true);
     me.loadModel(model);
   });
+
+  // IWC does not work
+  gadgets.util.registerOnLoadHandler(function () {
+    me.iwcClient = new iwc.Client("3D OBJECT");
+    me.iwcClient.connect(me.iwcCallbackFunction);
+  });
+
+  yjsSync().done(function(y){
+    window.y = y;
+    console.info('3D Object Viewer: Yjs successfully initialized');
+    var model = y.share.data.get('model');
+    y.share.nodes.get("5523343d1a4fa48231baed4a").then(function (node) {
+//      console.log(node.get('5523343d1a4fa48231baed4a[setting]'));
+//      console.log(node.set("5523343d1a4fa48231baed4a[setting]", "Hello, World")),then;
+    });
+
+    console.log(model);
+  }).fail(function(){
+    window.y= undefined;
+    console.log('3D Object Viewer: Yjs initialization failed');
+  });
+};
+
+viewer.iwcCallbackFunction = function (intent) {
+  console.log("OBJECT VIEWER RECEIVED INTENT", intent);
 };
 
 /**

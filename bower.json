@@ -16,6 +16,7 @@
     "tests"
   ],
   "dependencies": {
+    "iwc": "http://dbis.rwth-aachen.de/gadgets/iwc/lib/iwc.js",
     "jquery": "^2.2.4",
     "polymer": "Polymer/polymer#^1.5.0",
     "x3dom": "^1.7.1",
@@ -29,7 +30,13 @@
     "app-layout": "PolymerElements/app-layout#^0.9.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "iron-pages": "PolymerElements/iron-pages#^1.0.0",
-    "iron-icons": "PolymerElements/iron-icons#^1.0.0"
+    "iron-icons": "PolymerElements/iron-icons#^1.0.0",
+    "yjs": "^11.2.1",
+    "y-map": "^9.0.3",
+    "y-array": "^9.0.3",
+    "y-websockets-client": "^8.0.9",
+    "y-text": "^9.0.1",
+    "y-memory": "^8.0.5"
   },
   "resolutions": {
     "webcomponentsjs": "^0.7.20",

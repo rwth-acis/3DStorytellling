@@ -11,14 +11,18 @@
 <link rel="import" href="http://localhost:8082/src/js/lib/paper-styles/typography.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/paper-toast/paper-toast.html">
 
-<script src='http://localhost:8082/src/js/lib/jquery/dist/jquery.min.js'></script>
-<script src='http://localhost:8082/src/js/lib/x3dom/x3dom.js'></script>
+<script src="http://open-app.googlecode.com/files/openapp.js"></script>
+<script src="http://localhost:8082/src/js/lib/yjs/y.js"></script>
+<script src="http://localhost:8082/src/js/yjs-sync.js"></script>
+<script src="http://localhost:8082/src/js/lib/jquery/dist/jquery.min.js"></script>
+<script src="http://localhost:8082/src/js/lib/x3dom/x3dom.js"></script>
 <script src="http://localhost:8082/src/js/lib/clipboard/dist/clipboard.min.js"></script>
-<script src='http://localhost:8082/src/js/conf.js'></script>
-<script src='http://localhost:8082/src/js/util.js'></script>
-<script src='http://localhost:8082/src/js/viewer.js'></script>
+<script src="http://localhost:8082/src/js/lib/iwc/index.js"></script>
+<script src="http://localhost:8082/src/js/conf.js"></script>
+<script src="http://localhost:8082/src/js/util.js"></script>
+<script src="http://localhost:8082/src/js/viewer.js"></script>
 
-<link rel='stylesheet' type='text/css' href='http://localhost:8082/src/js/lib/x3dom/x3dom.css'></link>
+<link rel="stylesheet" type="text/css" href="http://localhost:8082/src/js/lib/x3dom/x3dom.css"></link>
 <link rel="import" href="http://localhost:8082/src/css/defaults.html">
 
 <style is="custom-style" include="iron-flex"></style>
@@ -39,7 +43,7 @@
         </paper-tabs>
 
         <div>
-            <div class="l2"">
+            <div class="l2">
                 <iron-pages selected={{mode}}>
                     <div>
                         <input id="curr_view" onClick="viewer.toClipboard('view');" value='"position="0 0 0" orientation="0 0 0 0"'>
