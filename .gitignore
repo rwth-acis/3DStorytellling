@@ -1,6 +1,7 @@
 *~
 *\#
 *.orig
+*.org
 *v8.log
 *.tern-project
 *yas.js
