@@ -21,24 +21,19 @@ viewer.init = function (model) {
     me.scene = $('#scene');
     me.elem[0].addEventListener("mousemove", me.handleOrientation, true);
     me.loadModel(model);
-  });
 
-  // IWC does not work
-  gadgets.util.registerOnLoadHandler(function () {
-    me.iwcClient = new iwc.Client("3D OBJECT");
-    me.iwcClient.connect(me.iwcCallbackFunction);
+    me.iwcClient = new Las2peerWidgetLibrary(window.location.href, viewer.iwcCallbackFunction);
+    
   });
 
   yjsSync().done(function(y){
     window.y = y;
     console.info('3D Object Viewer: Yjs successfully initialized');
     var model = y.share.data.get('model');
-    y.share.nodes.get("5523343d1a4fa48231baed4a").then(function (node) {
-//      console.log(node.get('5523343d1a4fa48231baed4a[setting]'));
-//      console.log(node.set("5523343d1a4fa48231baed4a[setting]", "Hello, World")),then;
-    });
-
     console.log(model);
+    y.share.data.observe(function () {
+      console.log("blablubb");
+    });
   }).fail(function(){
     window.y= undefined;
     console.log('3D Object Viewer: Yjs initialization failed');

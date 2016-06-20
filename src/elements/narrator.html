@@ -1,0 +1,83 @@
+<link rel="import" href="http://localhost:8082/src/js/lib/polymer/polymer.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/iron-pages/iron-pages.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/iron-icon/iron-icon.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/iron-icons/iron-icons.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/app-layout/app-layout.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/paper-tabs/paper-tabs.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/paper-card/paper-card.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/paper-button/paper-button.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/paper-styles/typography.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/paper-toast/paper-toast.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/paper-spinner/paper-spinner-lite.html">
+
+<script src="http://open-app.googlecode.com/files/openapp.js"></script>
+<script src="http://localhost:8082/src/js/lib/yjs/y.js"></script>
+<script src="http://localhost:8082/src/js/yjs-sync.js"></script>
+<script src="http://localhost:8082/src/js/lib/jquery/dist/jquery.min.js"></script>
+<script src="http://dbis.rwth-aachen.de/gadgets/iwc/lib/iwc.js"></script>
+<script src="http://localhost:8082/src/js/lib/las2peerWidgetLibrary.js"></script>
+<script src="http://localhost:8082/src/js/conf.js"></script>
+<script src="http://localhost:8082/src/js/util.js"></script>
+<script src="http://localhost:8082/src/js/story.js"></script>
+<script src="http://localhost:8082/src/js/narrator.js"></script>
+
+<link rel="import" href="http://localhost:8082/src/css/defaults.html">
+
+<style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+
+<dom-module id="story-viewer">
+    <template>
+        
+        <style include="shared-styles"></style>
+        <style is="custom-style">
+            .card-header {
+                @apply(--paper-font-headline);
+            }
+         
+         #cont {
+             background-color:var(--background-color);
+         }
+        </style>
+
+        <div id="cont" style="height:430px;overflow:auto;">
+            <paper-toolbar class="toolbar">
+                <paper-icon-button id="undo_button" icon="undo" onclick="narrator.undo();" disabled></paper-icon-button>
+                <span id="story_title" class="title">Loading...</span>
+                <paper-icon-button icon="menu"></paper-icon-button>
+            </paper-toolbar>
+            <div style="width:100%" class="horizontal center-justified layout">
+                <paper-card class="white">
+                    <div id="card_title" class="card-header"></div>
+                    <div id="card_media"><paper-spinner-lite class="spinner" active></paper-spinner-lite></div>
+                    <div id="card_caption" class="card-content"></div>
+                    <div id="card_links" class="card-actions"></div>
+                </paper-card>
+            </div>
+        </div>
+
+    </template>
+</dom-module>
+
+<script>
+ Polymer({
+     is: 'story-viewer',
+     
+     properties: {
+         bla : {
+             type : String
+         }
+     },
+
+     onResize: function() {
+         $('#cont').css('height', $(document).height());
+     },
+     
+     ready: function() {
+         narrator.init();
+         $(document).resize(this.onResize);
+         this.onResize();
+     }
+ });
+</script>

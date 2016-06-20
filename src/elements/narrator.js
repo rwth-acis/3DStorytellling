@@ -1,12 +1,10 @@
 <link rel="import" href="http://localhost:8082/src/js/lib/polymer/polymer.html">
-<link rel="import" href="http://localhost:8082/src/js/lib/iron-input/iron-input.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/iron-pages/iron-pages.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/iron-icon/iron-icon.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/iron-icons/iron-icons.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/app-layout/app-layout.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/paper-tabs/paper-tabs.html">
-<link rel="import" href="http://localhost:8082/src/js/lib/paper-input/paper-input.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/paper-button/paper-button.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/paper-styles/typography.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/paper-toast/paper-toast.html">
@@ -15,19 +13,19 @@
 <script src="http://localhost:8082/src/js/lib/yjs/y.js"></script>
 <script src="http://localhost:8082/src/js/yjs-sync.js"></script>
 <script src="http://localhost:8082/src/js/lib/jquery/dist/jquery.min.js"></script>
-<script src="http://localhost:8082/src/js/lib/x3dom/x3dom.js"></script>
 <script src="http://dbis.rwth-aachen.de/gadgets/iwc/lib/iwc.js"></script>
 <script src="http://localhost:8082/src/js/lib/las2peerWidgetLibrary.js"></script>
 <script src="http://localhost:8082/src/js/conf.js"></script>
 <script src="http://localhost:8082/src/js/util.js"></script>
-<script src="http://localhost:8082/src/js/viewer.js"></script>
+<script src="http://localhost:8082/src/js/story.js"></script>
+<script src="http://localhost:8082/src/js/narrator.js"></script>
 
 <link rel="stylesheet" type="text/css" href="http://localhost:8082/src/js/lib/x3dom/x3dom.css"></link>
 <link rel="import" href="http://localhost:8082/src/css/defaults.html">
 
 <style is="custom-style" include="iron-flex"></style>
 
-<dom-module id="obj-viewer">
+<dom-module id="polymer-test">
     <template>
 
         <style include="shared-styles"></style>
@@ -74,7 +72,7 @@
 
 <script>
  Polymer({
-     is: 'obj-viewer',
+     is: 'polymer-test',
      
      properties: {
          model: {

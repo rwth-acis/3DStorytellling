@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-  <ModulePrefs title="3D Object Viewer" description="" author="Jan Benscheid" author_email="benscheid@dbis.rwth-aachen.de" width="400" height="450">
+  <ModulePrefs title="Story Viewer" description="" author="Jan Benscheid" author_email="benscheid@dbis.rwth-aachen.de" width="400" height="450">
     <Require feature="opensocial-0.8"/>
     <Require feature="openapp"/>
     <Require feature="dynamic-height"/>
@@ -17,15 +17,15 @@
              <head>
              <meta charset="utf-8">
              <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-             <title>3D Object Viewer</title>
+             <title>Story Viewer</title>
              
              <script src="http://localhost:8082/src/js/lib/webcomponentsjs/webcomponents-lite.js"></script>
              
-             <link rel="import" href="http://localhost:8082/src/elements/viewer.html">
+             <link rel="import" href="http://localhost:8082/src/elements/narrator.html">
              </head>
              <body>
-             
-             <obj-viewer model="121"></obj-viewer>
+
+             <story-viewer></story-viewer>
              
              </body>
     ]]>
