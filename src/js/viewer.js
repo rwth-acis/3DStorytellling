@@ -30,10 +30,6 @@ viewer.init = function (model) {
     window.y = y;
     console.info('3D Object Viewer: Yjs successfully initialized');
     var model = y.share.data.get('model');
-    console.log(model);
-    y.share.data.observe(function () {
-      console.log("blablubb");
-    });
   }).fail(function(){
     window.y= undefined;
     console.log('3D Object Viewer: Yjs initialization failed');

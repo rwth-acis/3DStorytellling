@@ -11,7 +11,7 @@ narrator.init = function () {
     window.y = y;
     console.info('Story Viewer: Yjs successfully initialized');
     narrator.initStory(y.share.data.get('model'));
-    y.share.data.observe(narrator.refreshStory);
+    y.share.data.observe(narrator.storyChanged);
 
     me.display(me.story.getState());
     $('#story_title').html(me.story.getName());
@@ -26,8 +26,15 @@ narrator.initStory = function (story) {
   this.story = new Story(story);
 };
 
-narrator.refreshStory = function () {
+narrator.storyChanged = function (events) {
+  $('#refresh_button').removeAttr('disabled');
+};
+
+
+narrator.refresh = function () {
   narrator.story.update(window.y.share.data.get('model'));
+  narrator.display(narrator.story.getState());
+  $('#refresh_button').attr('disabled','');
 };
 
 narrator.goTo = function (id) {
