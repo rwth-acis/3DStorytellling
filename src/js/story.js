@@ -29,7 +29,12 @@ Story.NODES = {
     SU : "Story Unit"
   },
   TITLE : "Title",
-  CAPTION : "Caption"
+  CAPTION : "Caption",
+  MEDIA : {
+    TEXT : "Text",
+    IMAGE : "URL",
+    VIDEO : "URL"
+  }
 };
 
 Story.prototype.update = function (data) {
