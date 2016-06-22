@@ -4,26 +4,46 @@ narrator.story;
 
 narrator.path = new Array();
 
+narrator.iwcClient;
+
 narrator.init = function () {
   var me = this;
   
+  me.iwcClient = new Las2peerWidgetLibrary("", me.iwcCallback);
+
   yjsSync().done(function(y) {
-    window.y = y;
-    console.info('Story Viewer: Yjs successfully initialized');
-    narrator.initStory(y.share.data.get('model'));
-    y.share.data.observe(narrator.storyChanged);
+
+    function initY () {
+      window.y = y;
+      console.info('Story Viewer: Yjs successfully initialized');
+      narrator.initStory(y.share.data.get('model'));
+      y.share.data.observe(narrator.storyChanged);
+    }
+    initY();
+    
     $('#story_title').html(me.story.getName());
     if (window.story_state) {
       me.display(window.story_state);
     } else {
       me.display(me.story.getState());
       window.story_state = me.story.getState();
-    }
+    }    
+    
   }).fail(function(){
     window.y= undefined;
     console.log('Story Viewer: Yjs initialization failed');
   });
   
+};
+
+narrator.iwcCallback = function (intent) {
+  console.log("NARRATOR RECEIVED", intent);
+};
+
+narrator.iwcEmit = function (type, data) {
+  if (this.iwcClient) {
+    this.iwcClient.sendIntent(type, data);
+  }
 };
 
 narrator.initStory = function (story) {
@@ -55,6 +75,7 @@ narrator.undo = function () {
 };
 
 narrator.display = function (id) {
+  this.iwcEmit(conf.intents.story_currentNode, id);
   this.story.setState(id);
   var next = this.story.getStoryTransitions(id);
   var num = 0;

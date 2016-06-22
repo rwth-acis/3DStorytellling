@@ -26,14 +26,17 @@ Story.NODES = {
     BEGIN : "Begin",
     MIDDLE : "Middle",
     END : "End",
-    SU : "Story Unit"
+    SU : "Story Unit",
+    //
+    VIEW : "3D View"
   },
   TITLE : "Title",
   CAPTION : "Caption",
   MEDIA : {
     TEXT : "Text",
     IMAGE : "URL",
-    VIDEO : "URL"
+    VIDEO : "URL",
+    SETTING : "Setting"
   }
 };
 
@@ -105,6 +108,22 @@ Story.prototype.getAdjacentEdges = function (id) {
   }
 
   return res;
+};
+
+Story.prototype.getView = function (id) {
+  var adj = this.getAdjacentEdges(id);
+  for (var edgeId in adj) {
+    if (!adj.hasOwnProperty(edgeId)) {
+      continue;
+    }
+
+    var curr = adj[edgeId].target;
+    if (this.getNodeType(curr) == Story.NODES.TYPES.VIEW) {
+      return this.getNodeAttributes(curr)[Story.NODES.MEDIA.SETTING];
+    }
+  }
+
+  return null;
 };
 
 Story.prototype.getStoryTransitions = function (id) {

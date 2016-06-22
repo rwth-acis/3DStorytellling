@@ -9,5 +9,8 @@ var conf = {
       CONE_COLOR : '0 1 0',
       CONE_SIZE : 3
     }
+  },
+  intents : {
+    story_currentNode : "STORY_CURRNODE"
   }
 };

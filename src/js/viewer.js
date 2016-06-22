@@ -12,32 +12,56 @@ viewer.tagMode = false;
 
 viewer.iwcClient;
 
+viewer.story;
+
 viewer.init = function (model) {
   var me = this;
 
+  me.iwcClient = new Las2peerWidgetLibrary("", viewer.iwcCallback);
+  
   $(function () {
     me.elem = $('#elem');
     me.inline = $('#inline');
     me.scene = $('#scene');
     me.elem[0].addEventListener("mousemove", me.handleOrientation, true);
     me.loadModel(model);
-
-    me.iwcClient = new Las2peerWidgetLibrary(window.location.href, viewer.iwcCallbackFunction);
-    
   });
 
   yjsSync().done(function(y){
-    window.y = y;
-    console.info('3D Object Viewer: Yjs successfully initialized');
-    var model = y.share.data.get('model');
+    
+    function initY () {
+      window.y = y;
+      console.info('Object Viewer: Yjs successfully initialized');
+      viewer.initStory(y.share.data.get('model'));
+      y.share.data.observe(viewer.storyChanged);
+    }
+    initY();
+
   }).fail(function(){
     window.y= undefined;
     console.log('3D Object Viewer: Yjs initialization failed');
   });
 };
 
-viewer.iwcCallbackFunction = function (intent) {
-  console.log("OBJECT VIEWER RECEIVED INTENT", intent);
+viewer.iwcCallback = function (intent) {
+  console.log("VIEWER RECEIVED", intent);
+  switch (intent.action) {
+  case conf.intents.story_currentNode:
+    var view = viewer.story.getView(intent.data);
+    if (view && /position=".*" orientation=".*"/.test(view)) {
+      viewer.changeView(view);
+    }
+    break;
+  }
+};
+
+
+viewer.initStory = function (story) {
+  this.story = new Story(story);
+};
+
+viewer.storyChanged = function (events) {
+  this.story.update(window.y.share.data.get('model'));
 };
 
 /**
@@ -54,6 +78,7 @@ viewer.loadModel = function (id) {
  */
 viewer.onModelLoaded = function () {
   this.toStdView();
+  this.changeView(this.calcCam());
   this.elem[0].runtime.addEventListener("viewpointChanged", function(e){console.log(e.position);}, false);
 };
 
@@ -183,12 +208,13 @@ viewer.handleOrientation = function () {
 viewer.changeView = function (view) {
   var id = 'view_'+util.hashString(view);
   var existing = this.scene.find('#'+id);
-  if (existing) {
+  if (existing.length !== 0) {
     existing.attr('set_bind', 'true');
   } else {
     this.scene.append(
-      '<Viewpoint id="'+id+'" '+view+' description="camera" set_bind="true"'
+      '<Viewpoint id="'+id+'" '+view+' description="camera"></Viewpoint>'
     );
+    this.changeView(view);
   }
 };
 
