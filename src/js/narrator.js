@@ -144,11 +144,11 @@ narrator.emdedVideo = function (elem, cont) {
     var split = cont.split('.be/');
     split = split[split.length-1].split('?v=');
     split = split[split.length-1].split('&t=');
-    console.log(split);
     var video = document.createElement('google-youtube');
     video.setAttribute('video-id', split[0]);
     video.setAttribute('fluid', "true");
     video.setAttribute('rel', "0");
+    video.setAttribute('width', "100%");
     elem.append(video);
   }
 };
