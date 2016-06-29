@@ -1,6 +1,7 @@
 var conf = {
   external : {
-    OBJECT_ROOT : 'http://localhost:8082/assets/'
+    OBJECT_ROOT : 'http://localhost:8082/assets/',
+    LAS : ''
   },
   viewer : {
     CAM_OUTPUT_PRECISION : 3,

@@ -9,7 +9,7 @@ narrator.iwcClient;
 narrator.init = function () {
   var me = this;
   
-  me.iwcClient = new Las2peerWidgetLibrary("", me.iwcCallback);
+  me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, me.iwcCallback);
 
   yjsSync().done(function(y) {
 

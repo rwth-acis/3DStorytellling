@@ -1,4 +1,9 @@
 var viewer = {};
+
+viewer.TAGS = {
+  TEMP : 'temp'
+};
+
 // The x3dom element (jQuery)
 viewer.elem;
 
@@ -17,7 +22,7 @@ viewer.story;
 viewer.init = function (model) {
   var me = this;
 
-  me.iwcClient = new Las2peerWidgetLibrary("", viewer.iwcCallback);
+  me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, viewer.iwcCallback);
   
   $(function () {
     me.elem = $('#elem');
@@ -34,6 +39,7 @@ viewer.init = function (model) {
       console.info('Object Viewer: Yjs successfully initialized');
       viewer.initStory(y.share.data.get('model'));
       y.share.data.observe(viewer.storyChanged);
+      console.log(y.share.data.get('model'));
     }
     initY();
 
@@ -47,21 +53,30 @@ viewer.iwcCallback = function (intent) {
   console.log("VIEWER RECEIVED", intent);
   switch (intent.action) {
   case conf.intents.story_currentNode:
+    // parse and set view
     var view = viewer.story.getView(intent.data);
     if (view && /position=".*" orientation=".*"/.test(view)) {
       viewer.changeView(view);
     }
+
+    // set tags
+    viewer.cones.clear();
+    var tags = viewer.story.getTags(intent.data);
+    tags.forEach(function(tag) {
+      if (tag.position && /position=".*" orientation=".*"/.test(tag.position)) {
+        viewer.cones.createFromMeta(tag);
+      }
+    });
     break;
   }
 };
-
 
 viewer.initStory = function (story) {
   this.story = new Story(story);
 };
 
 viewer.storyChanged = function (events) {
-  this.story.update(window.y.share.data.get('model'));
+  viewer.story.update(window.y.share.data.get('model'));
 };
 
 /**
@@ -188,13 +203,20 @@ viewer.handleClick = function (event) {
       event.normalZ.toFixed(conf.viewer.TAG_OUTPUT_PRECISION);
   
   var text =
-      'position="'+pos_text+'"'+
+      'position="'+pos_text+'" '+
       'orientation="'+dir_text+'"';
   
   $('#curr_tag').attr('value', text);
 //  $('#curr_tag')[0].select();
-  this.cones.undoLastCone();
-  this.cones.generateCone(pos_text, dir_text);
+  this.cones.deleteConesByUser(viewer.TAGS.TEMP);
+  this.cones.generateCone(viewer.TAGS.TEMP, pos_text, dir_text);
+};
+
+viewer.handleTagClick = function (id) {
+  var attrs = this.story.getNodeAttributes(this.cones.cones[id].nodeId);
+  $('#tag_header').text(attrs[Story.NODES.MEDIA.TAG_NAME]);
+  $('#tag_text').text(attrs[Story.NODES.MEDIA.TAG_DESCRIPTION]);
+  $('#tag_dialog')[0].open();
 };
 
 viewer.handleOrientation = function () {
@@ -230,27 +252,40 @@ viewer.cones.cones = {};
 
 /**
  * Put a cone onto the model
+ * @param {string} author - Author ID
  * @param {string} pos - Position in "x y z"
  * @param {string} dir - Surface normal in "x y z"
  * @param {string} color - Color in "r g b"
  * @param {float} size - Size
  * @param {float} transparency - Transparency
+ * @return {} generated cone
  */
-viewer.cones.generateCone = function (pos, dir, color, size, transparency) {
-  var cone = new viewer.cones.cone(pos, dir, color, size, transparency);
+viewer.cones.generateCone = function (author, pos, dir, color, size, transparency) {
+  var cone = new viewer.cones.cone(author, pos, dir, color, size, transparency);
   cone.appendToScene(viewer.scene);
   this.lastCone = cone.getId();
   this.cones[cone.getId()] = cone;
-  return res;
+  return cone;
+};
+
+viewer.cones.createFromMeta = function (data) {
+  var info = data.position.split('"');
+  var cone = this.generateCone(null, info[1], info[3]);
+  cone.nodeId = data.nodeId;
 };
 
 /**
  * Remove the previously added cone
  */
-viewer.cones.undoLastCone = function () {
-  if (this.lastCone != null) {
-    this.deleteCone(this.lastCone);
-    this.lastCone = null;
+viewer.cones.deleteConesByUser = function (user) {  
+  for (var id in this.cones) {
+    if (!this.cones.hasOwnProperty(id)) {
+      continue;
+    }
+
+    if (this.cones[id].author == viewer.TAGS.TEMP) {
+      this.deleteCone(id);      
+    }
   }
 };
 
@@ -284,7 +319,7 @@ viewer.cones.clear = function () {
  * @param {float} size - Size
  * @param {float} transparency - Transparency
  */
-viewer.cones.cone = function (pos, dir, color, size, transparency) {
+viewer.cones.cone = function (author, pos, dir, color, size, transparency) {
   var pos = pos || '0 0 0';
   var dir = dir || '0 -1 0';
 
@@ -300,17 +335,18 @@ viewer.cones.cone = function (pos, dir, color, size, transparency) {
   var tag = 'cone_' + id;
   var html =
       "<transform id='" + tag + "' translation='" + pos + "' center='0 1 0' scale ='"+size+' '+size*2+' '+size+"' rotation='"+dirvec.toString()+" "+Math.PI+"'>" +
-    "<shape>" +
-        "<appearance>" +
+      "<shape onclick='viewer.handleTagClick("+id+");'>" +
+      "<appearance>" +
       "<material diffuseColor='" + color + "' transparency='0.5'></material>" +
-        "</appearance>" +
-        "<cone></cone>" +
-    "</shape>" +
-    "</transform>";
+      "</appearance>" +
+      "<cone></cone>" +
+      "</shape>" +
+      "</transform>";
 
   this.id = id;
   this.tag = tag;
   this.html = html;
+  this.author = author;
 };
 
 /**

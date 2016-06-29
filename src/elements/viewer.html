@@ -10,6 +10,9 @@
 <link rel="import" href="http://localhost:8082/src/js/lib/paper-button/paper-button.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/paper-styles/typography.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/paper-toast/paper-toast.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/paper-dialog/paper-dialog.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/neon-animation/animations/scale-down-animation.html">
 
 <script src="http://open-app.googlecode.com/files/openapp.js"></script>
 <script src="http://localhost:8082/src/js/lib/yjs/y.js"></script>
@@ -59,6 +62,14 @@
                 <paper-toast id="toast_cp_fail" class="toast_bad" text="You have to copy manually"></paper-toast>
             </div>
             <div id="div_3d">
+                <paper-dialog id="tag_dialog" entry-animation="scale-up-animation" exit-animation="scale-down-animation">
+                    <h2 id="tag_header">Header</h2>
+                    <div id="tag_text">Lorem ipsum</div>
+                    <div class="buttons">
+                        <paper-button dialog-dismiss>Close</paper-button>
+                    </div>
+                </paper-dialog>
+
                 <x3d id="elem" width="99vw" height="85vh"> 
                     <scene id="scene"">
                         <navigationInfo type='"any"' id="navType"></navigationInfo>

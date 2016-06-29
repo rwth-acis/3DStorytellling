@@ -28,7 +28,8 @@ Story.NODES = {
     END : "End",
     SU : "Story Unit",
     //
-    VIEW : "3D View"
+    VIEW : "3D View",
+    TAG : "3D Tag"
   },
   TITLE : "Title",
   CAPTION : "Caption",
@@ -36,7 +37,10 @@ Story.NODES = {
     TEXT : "Text",
     IMAGE : "URL",
     VIDEO : "URL",
-    SETTING : "Setting"
+    SETTING : "Setting",
+    TAG_POSITION : "Position",
+    TAG_NAME : "Title",
+    TAG_DESCRIPTION : "Description"
   }
 };
 
@@ -124,6 +128,30 @@ Story.prototype.getView = function (id) {
   }
 
   return null;
+};
+
+
+Story.prototype.getTags = function (id) {
+  var adj = this.getAdjacentEdges(id);
+  var res = [];
+  for (var edgeId in adj) {
+    if (!adj.hasOwnProperty(edgeId)) {
+      continue;
+    }
+
+    var curr = adj[edgeId].target;
+    if (this.getNodeType(curr) == Story.NODES.TYPES.TAG) {
+      var attr = this.getNodeAttributes(curr);
+      res.push({
+        title : attr[Story.NODES.MEDIA.TAG_TITLE],
+        position : attr[Story.NODES.MEDIA.TAG_POSITION],
+        description : attr[Story.NODES.MEDIA.TAG_DESCRIPTION],
+        nodeId : curr
+      }); 
+    }
+  }
+
+  return res;
 };
 
 Story.prototype.getStoryTransitions = function (id) {

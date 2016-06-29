@@ -41,7 +41,10 @@
     "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.0",
     "paper-toolbar": "PolymerElements/paper-toolbar#^1.0.0",
     "paper-spinner": "PolymerElements/paper-spinner#^1.0.0",
-    "google-youtube": "GoogleWebComponents/google-youtube#^1.2.1"
+    "google-youtube": "GoogleWebComponents/google-youtube#^1.2.1",
+    "paper-tooltip": "PolymerElements/paper-tooltip#^1.0.0",
+    "paper-dialog": "PolymerElements/paper-dialog#^1.0.0",
+    "neon-animation": "PolymerElements/neon-animation#^1.0.0"
   },
   "resolutions": {
     "webcomponentsjs": "^0.7.20",
