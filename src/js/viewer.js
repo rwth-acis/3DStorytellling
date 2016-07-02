@@ -20,7 +20,7 @@ viewer.iwcClient;
 viewer.story;
 
 viewer.init = function (model) {
-  var me = this;
+  var me = viewer;
 
   me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, viewer.iwcCallback);
   
@@ -29,7 +29,6 @@ viewer.init = function (model) {
     me.inline = $('#inline');
     me.scene = $('#scene');
     me.elem[0].addEventListener("mousemove", me.handleOrientation, true);
-    me.loadModel(model);
   });
 
   yjsSync().done(function(y){
@@ -40,6 +39,7 @@ viewer.init = function (model) {
       viewer.initStory(y.share.data.get('model'));
       y.share.data.observe(viewer.storyChanged);
       console.log(y.share.data.get('model'));
+      me.loadModel(model);
     }
     initY();
 
@@ -72,7 +72,7 @@ viewer.iwcCallback = function (intent) {
 };
 
 viewer.initStory = function (story) {
-  this.story = new Story(story);
+  viewer.story = new Story(story);
 };
 
 viewer.storyChanged = function (events) {
@@ -85,23 +85,23 @@ viewer.storyChanged = function (events) {
 viewer.loadModel = function (id) {
   var model = conf.external.OBJECT_ROOT+id+'.x3d';
   console.log('loading model from: '+model);
-  this.inline.attr('url', model);
+  viewer.inline.attr('url', model);
 };
 
 /**
  * Event handler for when the model is fully loaded
  */
 viewer.onModelLoaded = function () {
-  this.toStdView();
-  this.changeView(this.calcCam());
-  this.elem[0].runtime.addEventListener("viewpointChanged", function(e){console.log(e.position);}, false);
+  viewer.toStdView();
+  viewer.changeView(viewer.calcCam());
+  viewer.elem[0].runtime.addEventListener("viewpointChanged", function(e){console.log(e.position);}, false);
 };
 
 /**
  * Resets the camera to the default front view
  */
 viewer.toStdView = function () {
-  this.elem[0].runtime.showAll();
+  viewer.elem[0].runtime.showAll();
 };
 
 /**
@@ -125,20 +125,27 @@ viewer.toClipboard = function (type) {
  * Converts the current camera into the x3dom string
  */
 viewer.calcCam = function () {
-  var mat_view = this.elem[0].runtime.viewMatrix().inverse();
+  var mat_view = viewer.elem[0].runtime.viewMatrix().inverse();
+  var cor = viewer.elem[0].runtime.canvas.doc._scene.getViewpoint().getCenterOfRotation();
+  console.log(cor);
   var rotation = new x3dom.fields.Quaternion(0,0,1,0);
   rotation.setValue(mat_view);
   var rot=rotation.toAxisAngle();
   var translation=mat_view.e3();
-  var text =
+  var prec = conf.viewer.CAM_OUTPUT_PRECISION;
+  var text = 
      'position="'
-      +translation.x.toFixed(conf.viewer.CAM_OUTPUT_PRECISION)+' '
-      +translation.y.toFixed(conf.viewer.CAM_OUTPUT_PRECISION)+' '
-      +translation.z.toFixed(conf.viewer.CAM_OUTPUT_PRECISION)+'" '
-    +'orientation="'+rot[0].x.toFixed(conf.viewer.CAM_OUTPUT_PRECISION)+' '
-      +rot[0].y.toFixed(conf.viewer.CAM_OUTPUT_PRECISION)+' '
-      +rot[0].z.toFixed(conf.viewer.CAM_OUTPUT_PRECISION)+' '
-      +rot[1].toFixed(conf.viewer.CAM_OUTPUT_PRECISION)+'"';
+      +translation.x.toFixed(prec)+' '
+      +translation.y.toFixed(prec)+' '
+      +translation.z.toFixed(prec)+'" '
+    +'orientation="'+rot[0].x.toFixed(prec)+' '
+      +rot[0].y.toFixed(prec)+' '
+      +rot[0].z.toFixed(prec)+' '
+      +rot[1].toFixed(prec)+'" '
+    +'centerOfRotation"'
+      +cor.x.toFixed(prec)+' '
+      +cor.y.toFixed(prec)+' '
+      +cor.z.toFixed(prec)+'"';
   return text;
 };
 
@@ -146,7 +153,7 @@ viewer.calcCam = function () {
  * Event handler for 'add to clipboard' buttons
  */
 viewer.clipboardButton = function (type) {
-  if (this.toClipboard(type)) {
+  if (viewer.toClipboard(type)) {
     toast_cp.open();
   } else {
     toast_cp_fail.open();
@@ -158,8 +165,8 @@ viewer.clipboardButton = function (type) {
  * Start making tags
  */
 viewer.enterTagMode = function () {
-  this.tagMode = true;
-  this.setNavigation(false);
+  viewer.tagMode = true;
+  viewer.setNavigation(false);
 //  $('#tagmode').prop('disabled', true);
 //  $('#div_mode').html('Tag:');
   $('#curr_tag').attr('value', 'Click somewhere');
@@ -169,11 +176,11 @@ viewer.enterTagMode = function () {
  * Stop making tags
  */
 viewer.leaveTagMode = function () {
-  this.tagMode = false;
-  this.setNavigation(true);
+  viewer.tagMode = false;
+  viewer.setNavigation(true);
  // $('#tagmode').prop('disabled', false);
  // $('#div_mode').html('View:');
- // this.cones.undoLastCone();
+ // viewer.cones.undoLastCone();
 };
 
 /**
@@ -189,7 +196,7 @@ viewer.setNavigation = function (state) {
  * @param {event} event 
  */
 viewer.handleClick = function (event) {
-  if (!this.tagMode) {
+  if (!viewer.tagMode) {
     return;
   }
   var pos_text =
@@ -208,19 +215,24 @@ viewer.handleClick = function (event) {
   
   $('#curr_tag').attr('value', text);
 //  $('#curr_tag')[0].select();
-  this.cones.deleteConesByUser(viewer.TAGS.TEMP);
-  this.cones.generateCone(viewer.TAGS.TEMP, pos_text, dir_text);
+  viewer.cones.deleteConesByUser(viewer.TAGS.TEMP);
+  viewer.cones.generateCone(viewer.TAGS.TEMP, pos_text, dir_text);
 };
 
 viewer.handleTagClick = function (id) {
-  var attrs = this.story.getNodeAttributes(this.cones.cones[id].nodeId);
+  var attrs = viewer.story.getNodeAttributes(viewer.cones.cones[id].nodeId);
   $('#tag_header').text(attrs[Story.NODES.MEDIA.TAG_NAME]);
   $('#tag_text').text(attrs[Story.NODES.MEDIA.TAG_DESCRIPTION]);
   $('#tag_dialog')[0].open();
 };
 
+viewer.lastView = "";
 viewer.handleOrientation = function () {
-  $('#curr_view').attr('value', viewer.calcCam());
+  var str = viewer.calcCam();
+  if (str !== viewer.lastView) {
+    viewer.lastView = str;
+    $('#curr_view').attr('value', str);
+  }
 };
 
 /**
@@ -229,14 +241,14 @@ viewer.handleOrientation = function () {
  */
 viewer.changeView = function (view) {
   var id = 'view_'+util.hashString(view);
-  var existing = this.scene.find('#'+id);
+  var existing = viewer.scene.find('#'+id);
   if (existing.length !== 0) {
     existing.attr('set_bind', 'true');
   } else {
-    this.scene.append(
+    viewer.scene.append(
       '<Viewpoint id="'+id+'" '+view+' description="camera"></Viewpoint>'
     );
-    this.changeView(view);
+    viewer.changeView(view);
   }
 };
 

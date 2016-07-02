@@ -25,7 +25,7 @@
              </head>
              <body>
              
-             <obj-viewer model="121"></obj-viewer>
+             <obj-viewer model="cube"></obj-viewer>
              
              </body>
     ]]>

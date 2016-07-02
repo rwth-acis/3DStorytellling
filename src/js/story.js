@@ -37,7 +37,7 @@ Story.NODES = {
     TEXT : "Text",
     IMAGE : "URL",
     VIDEO : "URL",
-    SETTING : "Setting",
+    SETTING : "View",
     TAG_POSITION : "Position",
     TAG_NAME : "Title",
     TAG_DESCRIPTION : "Description"
