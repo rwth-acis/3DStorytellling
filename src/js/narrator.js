@@ -39,6 +39,18 @@ narrator.init = function () {
 
 narrator.iwcCallback = function (intent) {
   console.log("NARRATOR RECEIVED", intent);
+  switch (intent.action) {
+  case conf.intents.syncmeta:
+    var payload = intent.extras.payload.data;
+    if (payload.type == conf.operations.entitySelect) {
+      var data = JSON.parse(payload.data);
+      var id = data.selectedEntityId;
+      if (Story.NODES.TYPES.MEDIA.includes(narrator.story.getNodeType(id))) {
+        narrator.display(id, true);
+      }
+    }
+    break;
+  }
 };
 
 narrator.iwcEmit = function (type, data) {
@@ -75,8 +87,10 @@ narrator.undo = function () {
   }
 };
 
-narrator.display = function (id) {
-  this.iwcEmit(conf.intents.story_currentNode, id);
+narrator.display = function (id, hide) {
+  if (!hide) {
+    this.iwcEmit(conf.intents.story_currentNode, id);
+  }
   this.story.setState(id);
   var next = this.story.getStoryTransitions(id);
   var num = 0;
