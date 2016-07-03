@@ -8,8 +8,9 @@ narrator.iwcClient;
 
 narrator.init = function () {
   var me = this;
-  
-  me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, me.iwcCallback);
+
+  // pretend to be the attribute widget, in order to receive the canvas' messages
+  me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, me.iwcCallback, "ATTRIBUTE");
 
   yjsSync().done(function(y) {
 
@@ -42,7 +43,7 @@ narrator.iwcCallback = function (intent) {
 
 narrator.iwcEmit = function (type, data) {
   if (this.iwcClient) {
-    this.iwcClient.sendIntent(type, data);
+    this.iwcClient.sendIntent(type, data, false);
   }
 };
 

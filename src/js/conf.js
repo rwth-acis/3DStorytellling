@@ -12,6 +12,14 @@ var conf = {
     }
   },
   intents : {
-    story_currentNode : "STORY_CURRNODE"
+    story_currentNode : "STORY_CURRNODE",
+    syncmeta : "ACTION_DATA"
+  },
+  operations : {
+    entitySelect : "EntitySelectOperation"
+  },
+  regex : {
+    view : /position=".*" orientation=".*"( centerOfRotation=".*")?/,
+    tag : /position=".*" orientation=".*"/
   }
 };

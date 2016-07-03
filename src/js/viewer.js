@@ -22,7 +22,8 @@ viewer.story;
 viewer.init = function (model) {
   var me = viewer;
 
-  me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, viewer.iwcCallback);
+  // pretend to be the attribute widget, in order to receive the canvas' messages
+  me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, viewer.iwcCallback, "ATTRIBUTE");
   
   $(function () {
     me.elem = $('#elem');
@@ -55,7 +56,7 @@ viewer.iwcCallback = function (intent) {
   case conf.intents.story_currentNode:
     // parse and set view
     var view = viewer.story.getView(intent.data);
-    if (view && /position=".*" orientation=".*"/.test(view)) {
+    if (view && conf.regex.view.test(view)) {
       viewer.changeView(view);
     }
 
@@ -63,10 +64,20 @@ viewer.iwcCallback = function (intent) {
     viewer.cones.clear();
     var tags = viewer.story.getTags(intent.data);
     tags.forEach(function(tag) {
-      if (tag.position && /position=".*" orientation=".*"/.test(tag.position)) {
+      if (tag.position && conf.regex.tag.test(tag.position)) {
         viewer.cones.createFromMeta(tag);
       }
     });
+    break;
+  case conf.intents.syncmeta:
+    var payload = intent.extras.payload.data;
+    if (payload.type == conf.operations.entitySelect) {
+      var data = JSON.parse(payload.data);
+      var view = viewer.story.getView(data.selectedEntityId);
+      if (view && conf.regex.view.test(view)) {
+        viewer.changeView(view);
+      }
+    }
     break;
   }
 };
@@ -127,7 +138,6 @@ viewer.toClipboard = function (type) {
 viewer.calcCam = function () {
   var mat_view = viewer.elem[0].runtime.viewMatrix().inverse();
   var cor = viewer.elem[0].runtime.canvas.doc._scene.getViewpoint().getCenterOfRotation();
-  console.log(cor);
   var rotation = new x3dom.fields.Quaternion(0,0,1,0);
   rotation.setValue(mat_view);
   var rot=rotation.toAxisAngle();

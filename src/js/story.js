@@ -115,6 +115,9 @@ Story.prototype.getAdjacentEdges = function (id) {
 };
 
 Story.prototype.getView = function (id) {
+  if (this.getNodeType(id) == Story.NODES.TYPES.VIEW) {
+    return this.getNodeAttributes(id)[Story.NODES.MEDIA.SETTING];
+  }
   var adj = this.getAdjacentEdges(id);
   for (var edgeId in adj) {
     if (!adj.hasOwnProperty(edgeId)) {
