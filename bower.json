@@ -44,7 +44,10 @@
     "google-youtube": "GoogleWebComponents/google-youtube#^1.2.1",
     "paper-tooltip": "PolymerElements/paper-tooltip#^1.0.0",
     "paper-dialog": "PolymerElements/paper-dialog#^1.0.0",
-    "neon-animation": "PolymerElements/neon-animation#^1.0.0"
+    "neon-animation": "PolymerElements/neon-animation#^1.0.0",
+    "iron-list": "PolymerElements/iron-list#^1.0.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.0.0",
+    "paper-fab": "PolymerElements/paper-fab#^1.0.0"
   },
   "resolutions": {
     "webcomponentsjs": "^0.7.20",
