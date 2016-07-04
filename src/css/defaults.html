@@ -1,49 +1,60 @@
 <dom-module id="shared-styles">
-    <template>
-        <style>
-         :root {
-             --normal-color : #00cc55;
-             --accent-color : #008800;
-             --background-color: #EEEEEE;
+  <template>
+    <style is="custom-style">
+      .horizontal {
+      @apply(--layout-horizontal);
+      }
+      .flex {
+      @apply(--layout-flex);
+      }
+      .centered {
+      @apply(--layout-center-justified);
+      }
+      </style>
+      <style>
+        :root {
+        --normal-color : #00cc55;
+        --accent-color : #008800;
+        --background-color: #EEEEEE;
 
-             --paper-tabs  {
-                 --paper-tabs-selection-bar-color : var(--accent-color);
-                 --paper-tab-ink : var(--accent-color);
-             }
-         } 
+        --paper-tabs  {
+        --paper-tabs-selection-bar-color : var(--accent-color);
+        --paper-tab-ink : var(--accent-color);
+        }
+        } 
 
-         
-         .l1 {
-             background-color : var(--normal-color);                 
-             height: 30px;
-         }
+        
+        .l1 {
+        background-color : var(--normal-color);                 
+        height: 30px;
+        }
 
-         .l2 {
-             background-color : var(--background-color);
-             padding: 5px;
-         }
+        .l2 {
+        background-color : var(--background-color);
+        padding: 5px;
+        }
 
-         .l2_button {
-             background : white;
-         }
+        .l2_button {
+        background : white;
+        }
 
-         .toast {
-         }
-         
-         .toast_bad {
-             --paper-toast-background-color: red
-         }
-         
-         .toast_good {
-             --paper-toast-background-color: green
-         }
+        .toast {
+        }
+        
+        .toast_bad {
+        --paper-toast-background-color: red
+        }
+        
+        .toast_good {
+        --paper-toast-background-color: green
+        }
 
-         .spinner { --paper-spinner-color: var(--normal-color); }
+        .spinner { --paper-spinner-color: var(--normal-color); }
 
-         .toolbar {
-         --paper-toolbar-background: var(--normal-color);
-         }
-         
-        </style>
-    </template>
+        .toolbar {
+        --paper-toolbar-background: var(--normal-color);
+        }
+        
+      </style>
+  </template>
 </dom-module>
