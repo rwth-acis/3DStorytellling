@@ -38,7 +38,7 @@ Story.NODES = {
     IMAGE : "URL",
     VIDEO : "URL",
     SETTING : "View",
-    TAG_POSITION : "Position",
+    TAG_POSITION : "Tag",
     TAG_NAME : "Title",
     TAG_DESCRIPTION : "Description"
   }
@@ -146,7 +146,7 @@ Story.prototype.getTags = function (id) {
     if (this.getNodeType(curr) == Story.NODES.TYPES.TAG) {
       var attr = this.getNodeAttributes(curr);
       res.push({
-        title : attr[Story.NODES.MEDIA.TAG_TITLE],
+        title : attr[Story.NODES.MEDIA.TAG_NAME],
         position : attr[Story.NODES.MEDIA.TAG_POSITION],
         description : attr[Story.NODES.MEDIA.TAG_DESCRIPTION],
         nodeId : curr

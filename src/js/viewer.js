@@ -63,7 +63,9 @@ viewer.iwcCallback = function (intent) {
     // set tags
     viewer.cones.clear();
     var tags = viewer.story.getTags(intent.data);
+    console.log(tags);
     tags.forEach(function(tag) {
+      console.log(tag);
       if (tag.position && conf.regex.tag.test(tag.position)) {
         viewer.cones.createFromMeta(tag);
       }
@@ -152,7 +154,7 @@ viewer.calcCam = function () {
       +rot[0].y.toFixed(prec)+' '
       +rot[0].z.toFixed(prec)+' '
       +rot[1].toFixed(prec)+'" '
-    +'centerOfRotation"'
+    +'centerOfRotation="'
       +cor.x.toFixed(prec)+' '
       +cor.y.toFixed(prec)+' '
       +cor.z.toFixed(prec)+'"';
