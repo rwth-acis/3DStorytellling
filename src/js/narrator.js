@@ -2,6 +2,8 @@ var narrator = {};
 
 narrator.story;
 
+narrator.storyReady = false;
+
 narrator.path = new Array();
 
 narrator.iwcClient;
@@ -21,14 +23,6 @@ narrator.init = function () {
       y.share.data.observe(narrator.storyChanged);
     }
     initY();
-    
-    $('#story_title').html(me.story.getName());
-    if (window.story_state) {
-      me.display(window.story_state);
-    } else {
-      me.display(me.story.getState());
-      window.story_state = me.story.getState();
-    }    
     
   }).fail(function(){
     window.y= undefined;
@@ -61,17 +55,52 @@ narrator.iwcEmit = function (type, data) {
 
 narrator.initStory = function (story) {
   this.story = new Story(story);
+  narrator.refresh();
+};
+
+narrator.bindStory = function () {
+  $('#story_title').html(me.story.getName());
+  if (window.story_state) {
+    me.display(window.story_state);
+  } else {
+    me.display(me.story.getState());
+    window.story_state = me.story.getState();
+  }
+  narrator.storyReady = true;
 };
 
 narrator.storyChanged = function (events) {
   $('#refresh_button').removeAttr('disabled');
 };
 
-
 narrator.refresh = function () {
   narrator.story.update(window.y.share.data.get('model'));
-  narrator.display(narrator.story.getState());
+  if (narrator.story.isEmpty()) {
+    narrator.showTutorial();
+  } else if (!narrator.story.getState()) {
+    var entry = narrator.story.getEntryNode();
+    if (entry) {
+      narrator.story.setState(entry);
+      narrator.story.setStart(entry);
+      narrator.display(narrator.story.getState());
+    } else {
+      narrator.showNoBegin();
+    }
+  } else {
+    narrator.display(narrator.story.getState());
+  }
+
   $('#refresh_button').attr('disabled','');
+};
+
+narrator.showTutorial = function () {
+  console.log(conf.external);
+  narrator.embedImage($('#card_media'), conf.external.ROOT+'img/tut.jpg');
+  $('#card_caption').text(lang.TUTORIAL);
+};
+
+narrator.showNoBegin = function () {
+  $('#card_caption').text(lang.NO_BEGIN);
 };
 
 narrator.goTo = function (id) {
@@ -118,13 +147,13 @@ narrator.display = function (id, hide) {
   var mediaElem = $('#card_media');
   switch (this.story.getNodeType(id)) {
   case Story.NODES.TYPES.TEXT:
-    this.emdedText(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.TEXT]);
+    this.embedText(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.TEXT]);
     break;
   case Story.NODES.TYPES.IMAGE:
-    this.emdedImage(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.IMAGE]);
+    this.embedImage(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.IMAGE]);
     break;
   case Story.NODES.TYPES.VIDEO:
-    this.emdedVideo(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.VIDEO]);
+    this.embedVideo(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.VIDEO]);
     break;    
   }
   
@@ -146,15 +175,15 @@ narrator.display = function (id, hide) {
   $('#cont').animate({ scrollTop: (0) }, 'slow');
 };
 
-narrator.emdedText = function (elem, cont) {
+narrator.embedText = function (elem, cont) {
   elem.text(cont);
 };
 
-narrator.emdedImage = function (elem, cont) {
-  elem.html('<img src="'+cont+'">');
+narrator.embedImage = function (elem, cont) {
+  elem.html('<img style="width:100%; height:auto;" src="'+cont+'">');
 };
 
-narrator.emdedVideo = function (elem, cont) {
+narrator.embedVideo = function (elem, cont) {
   if (/((https:\/\/)?youtu\.be\/.*)|((https:\/\/)?www\.)?youtube\..*\/watch\?v=.*/.test(cont)) {
     var split = cont.split('.be/');
     split = split[split.length-1].split('?v=');

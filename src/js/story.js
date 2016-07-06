@@ -9,7 +9,7 @@ var Story = function (story) {
 Story.EDGES = {
   TYPES : {
     TRANSITION : "Story Transition",
-    BME_SU : "BME -> SU",
+    BME_SU : "Story Unit Connection",
     SU_BME : "BME split",
     BME_MEDIA : "Media Connection"
   },
@@ -56,6 +56,10 @@ Story.prototype.getState = function () {
   return this.state;
 };
 
+Story.prototype.setStart = function (start) {
+  this.start = start;
+};
+
 Story.prototype.getStart = function () {
   return this.start;
 };
@@ -79,6 +83,14 @@ Story.prototype.getAttributes = function (attr) {
   }
 
   return res;
+};
+
+Story.prototype.isEmpty = function () {
+  if (!this.data) {
+    return true;
+  } else {
+    return $.isEmptyObject(this.data.nodes);
+  }
 };
 
 Story.prototype.getNodeType = function (id) {
@@ -179,6 +191,9 @@ Story.prototype.getStoryTransitions = function (id) {
 };
 
 Story.prototype.getRoot = function () {
+  if (!this.data) {
+    return null;
+  }
   for (var nodeId in this.data.nodes) {
     if (!this.data.nodes.hasOwnProperty(nodeId)) {
       continue;
@@ -231,7 +246,11 @@ Story.prototype.fall = function (id) {
     }
   }
 
-  return id;
+  if (Story.NODES.TYPES.MEDIA.includes(this.getNodeType(id))) {
+    return id;
+  } else {
+    return null;
+  } 
 };
 
 Story.prototype.getName = function () {

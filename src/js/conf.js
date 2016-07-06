@@ -1,5 +1,6 @@
 var conf = {
   external : {
+    ROOT : 'http://localhost:8082/',
     OBJECT_ROOT : 'http://localhost:8082/assets/',
     LAS : ''
   },
