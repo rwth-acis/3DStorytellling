@@ -8,8 +8,16 @@ narrator.path = new Array();
 
 narrator.iwcClient;
 
-narrator.init = function () {
+narrator.editorMode;
+narrator.maskMode;
+
+narrator.init = function (editorMode) {
   var me = this;
+  narrator.editorMode = editorMode;
+  narrator.maskMode = !editorMode;
+  if (!editorMode) {
+    $('#refresh_button').remove();
+  }
 
   // pretend to be the attribute widget, in order to receive the canvas' messages
   me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, me.iwcCallback, "ATTRIBUTE");
@@ -121,7 +129,7 @@ narrator.display = function (id, hide) {
     this.iwcEmit(conf.intents.story_currentNode, id);
   }
   this.story.setState(id);
-  var next = this.story.getStoryTransitions(id);
+  var next = this.story.getStoryTransitions(id, narrator.maskMode);
   var num = 0;
   var one = "";
   for (var edgeId in next) {

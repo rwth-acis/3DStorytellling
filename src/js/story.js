@@ -4,6 +4,8 @@ var Story = function (story) {
   this.state = this.getEntryNode();
 
   this.start = this.state;
+
+  this.visited = [];
 }
 
 Story.EDGES = {
@@ -11,7 +13,8 @@ Story.EDGES = {
     TRANSITION : "Story Transition",
     BME_SU : "Story Unit Connection",
     SU_BME : "BME split",
-    BME_MEDIA : "Media Connection"
+    BME_MEDIA : "Media Connection",
+    REQUIREMENT : "Requirement"
   },
   NAME : "Name"
 };
@@ -50,6 +53,7 @@ Story.prototype.update = function (data) {
 
 Story.prototype.setState = function (id) {
   this.state = id;
+  this.visited.push(id);
 };
 
 Story.prototype.getState = function () {
@@ -169,7 +173,11 @@ Story.prototype.getTags = function (id) {
   return res;
 };
 
-Story.prototype.getStoryTransitions = function (id) {
+/**
+ * @param {int} id
+ * @param {bool} mask - only return next steps that filfill the requirements
+ */
+Story.prototype.getStoryTransitions = function (id, mask) {
   var edges = this.getAdjacentEdges(id);
   var res = {};
   
@@ -180,10 +188,35 @@ Story.prototype.getStoryTransitions = function (id) {
 
     var curr = edges[edgeId];
     if (curr.type == Story.EDGES.TYPES.TRANSITION && curr.dir === 1) {
+      if (mask) {
+        var reqs = this.getRequirements(curr.target);
+        if (!util.containsAll(this.visited, reqs)) {
+          continue;
+        }
+      }
+
       res[edgeId] = {
         target : curr.target,
         name : curr.attributes[Story.EDGES.NAME]
       }
+    }
+  }
+
+  return res;
+};
+
+Story.prototype.getRequirements = function (id) {
+  var edges = this.getAdjacentEdges(id);
+  var res = [];
+  
+  for (var edgeId in edges) {
+    if (!edges.hasOwnProperty(edgeId)) {
+      continue;
+    }
+
+    var curr = edges[edgeId];
+    if (curr.type == Story.EDGES.TYPES.REQUIREMENT && curr.dir === 1) {
+      res.push(curr.target);
     }
   }
 

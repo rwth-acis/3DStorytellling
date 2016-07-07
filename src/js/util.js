@@ -8,5 +8,13 @@ util = {
       hash = hash & hash; // Convert to 32bit integer
     }
     return Math.abs(hash);
+  },
+  containsAll : function (a, b) {
+    for (var i = 0; i < b.length; i++) {
+      if (!a.includes(b[i])) {
+        return false;
+      }
+    }
+    return true;
   }
 };

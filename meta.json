@@ -244,8 +244,8 @@
                     "value": "BME split"
                 }
             },
-            "left": 4818,
-            "top": 4264,
+            "left": 4855,
+            "top": 4274,
             "width": 150,
             "height": 100,
             "zIndex": 16006,
@@ -266,7 +266,7 @@
                 "value": {
                     "id": "9066b0be42c83d5d33c78976[label]",
                     "name": "Label",
-                    "value": "BME -> SU"
+                    "value": "Story Unit Connection"
                 }
             },
             "left": 5429,
@@ -1441,6 +1441,107 @@
                     "list": {}
                 }
             }
+        },
+        "def62939b93376138db7c3d9": {
+            "label": {
+                "id": "def62939b93376138db7c3d9[label]",
+                "name": "Label",
+                "value": {
+                    "id": "def62939b93376138db7c3d9[label]",
+                    "name": "Label",
+                    "value": "Requirement"
+                }
+            },
+            "left": 5623,
+            "top": 4369,
+            "width": 150,
+            "height": 100,
+            "zIndex": 16037,
+            "type": "Relationship",
+            "attributes": {
+                "[attributes]": {
+                    "id": "[attributes]",
+                    "name": "Attributes",
+                    "type": "KeySelectionValueSelectionValueListAttribute",
+                    "list": {}
+                }
+            }
+        },
+        "7ba854b84e9ce94cff1f91c6": {
+            "label": {
+                "id": "7ba854b84e9ce94cff1f91c6[label]",
+                "name": "Label",
+                "value": {
+                    "id": "7ba854b84e9ce94cff1f91c6[label]",
+                    "name": "Label",
+                    "value": ""
+                }
+            },
+            "left": 5839,
+            "top": 4185,
+            "width": 150,
+            "height": 150,
+            "zIndex": 16038,
+            "type": "Edge Shape",
+            "attributes": {
+                "7ba854b84e9ce94cff1f91c6[arrow]": {
+                    "id": "7ba854b84e9ce94cff1f91c6[arrow]",
+                    "name": "Arrow",
+                    "value": {
+                        "id": "7ba854b84e9ce94cff1f91c6[arrow]",
+                        "name": "Arrow",
+                        "value": "generalisation"
+                    },
+                    "option": "--▷"
+                },
+                "7ba854b84e9ce94cff1f91c6[shape]": {
+                    "id": "7ba854b84e9ce94cff1f91c6[shape]",
+                    "name": "Shape",
+                    "value": {
+                        "id": "7ba854b84e9ce94cff1f91c6[shape]",
+                        "name": "Shape",
+                        "value": "straight"
+                    },
+                    "option": "Straight"
+                },
+                "7ba854b84e9ce94cff1f91c6[color]": {
+                    "id": "7ba854b84e9ce94cff1f91c6[color]",
+                    "name": "Color",
+                    "value": {
+                        "id": "7ba854b84e9ce94cff1f91c6[color]",
+                        "name": "Color",
+                        "value": ""
+                    }
+                },
+                "7ba854b84e9ce94cff1f91c6[overlay]": {
+                    "id": "7ba854b84e9ce94cff1f91c6[overlay]",
+                    "name": "Overlay Text",
+                    "value": {
+                        "id": "7ba854b84e9ce94cff1f91c6[overlay]",
+                        "name": "Overlay Text",
+                        "value": ""
+                    }
+                },
+                "7ba854b84e9ce94cff1f91c6[overlayPosition]": {
+                    "id": "7ba854b84e9ce94cff1f91c6[overlayPosition]",
+                    "name": "Overlay Position",
+                    "value": {
+                        "id": "7ba854b84e9ce94cff1f91c6[overlayPosition]",
+                        "name": "Overlay Position",
+                        "value": "hidden"
+                    },
+                    "option": "Hide"
+                },
+                "7ba854b84e9ce94cff1f91c6[overlayRotate]": {
+                    "id": "7ba854b84e9ce94cff1f91c6[overlayRotate]",
+                    "name": "Autoflip Overlay",
+                    "value": {
+                        "id": "7ba854b84e9ce94cff1f91c6[overlayRotate]",
+                        "name": "Autoflip Overlay",
+                        "value": true
+                    }
+                }
+            }
         }
     },
     "edges": {
@@ -1819,63 +1920,93 @@
             "attributes": {},
             "type": "Bi-Dir-Association"
         },
-        "80b3f5f936a20d5e5eac01c5": {
+        "8f2375c4606ba734762eb14d": {
             "label": {
-                "id": "80b3f5f936a20d5e5eac01c5[label]",
+                "id": "8f2375c4606ba734762eb14d[label]",
                 "name": "Label",
                 "value": {
-                    "id": "80b3f5f936a20d5e5eac01c5[label]",
+                    "id": "8f2375c4606ba734762eb14d[label]",
                     "name": "Label",
                     "value": ""
                 }
             },
-            "source": "c99b9793d941dfa06672a888",
+            "source": "05d477d2896fb9ab406cc306",
             "target": "cb77130ad7cd3b6ef8e26650",
             "attributes": {},
-            "type": "Bi-Dir-Association"
+            "type": "Uni-Dir-Association"
         },
-        "deeb44bb3f054b3046f75a87": {
+        "933a230b784f789107d24e94": {
             "label": {
-                "id": "deeb44bb3f054b3046f75a87[label]",
+                "id": "933a230b784f789107d24e94[label]",
                 "name": "Label",
                 "value": {
-                    "id": "deeb44bb3f054b3046f75a87[label]",
+                    "id": "933a230b784f789107d24e94[label]",
                     "name": "Label",
                     "value": ""
                 }
             },
             "source": "cb77130ad7cd3b6ef8e26650",
-            "target": "05d477d2896fb9ab406cc306",
+            "target": "c99b9793d941dfa06672a888",
             "attributes": {},
-            "type": "Bi-Dir-Association"
+            "type": "Uni-Dir-Association"
         },
-        "7ece4e1fca16e1a587c1c137": {
+        "196c7b169e6c847adc6d3157": {
             "label": {
-                "id": "7ece4e1fca16e1a587c1c137[label]",
+                "id": "196c7b169e6c847adc6d3157[label]",
                 "name": "Label",
                 "value": {
-                    "id": "7ece4e1fca16e1a587c1c137[label]",
-                    "name": "Label",
-                    "value": ""
-                }
-            },
-            "source": "c99b9793d941dfa06672a888",
-            "target": "0d85794c6734658991f1e7a0",
-            "attributes": {},
-            "type": "Bi-Dir-Association"
-        },
-        "ea5a19fd0e7562e389734fb0": {
-            "label": {
-                "id": "ea5a19fd0e7562e389734fb0[label]",
-                "name": "Label",
-                "value": {
-                    "id": "ea5a19fd0e7562e389734fb0[label]",
+                    "id": "196c7b169e6c847adc6d3157[label]",
                     "name": "Label",
                     "value": ""
                 }
             },
             "source": "0d85794c6734658991f1e7a0",
-            "target": "928e4ed8a2cea7bdca11b4bb",
+            "target": "c99b9793d941dfa06672a888",
+            "attributes": {},
+            "type": "Uni-Dir-Association"
+        },
+        "e9f9c4642cd291e0e261a5fc": {
+            "label": {
+                "id": "e9f9c4642cd291e0e261a5fc[label]",
+                "name": "Label",
+                "value": {
+                    "id": "e9f9c4642cd291e0e261a5fc[label]",
+                    "name": "Label",
+                    "value": ""
+                }
+            },
+            "source": "928e4ed8a2cea7bdca11b4bb",
+            "target": "0d85794c6734658991f1e7a0",
+            "attributes": {},
+            "type": "Uni-Dir-Association"
+        },
+        "dd7891cea0c7a7638c89a0d1": {
+            "label": {
+                "id": "dd7891cea0c7a7638c89a0d1[label]",
+                "name": "Label",
+                "value": {
+                    "id": "dd7891cea0c7a7638c89a0d1[label]",
+                    "name": "Label",
+                    "value": ""
+                }
+            },
+            "source": "def62939b93376138db7c3d9",
+            "target": "c99b9793d941dfa06672a888",
+            "attributes": {},
+            "type": "Bi-Dir-Association"
+        },
+        "1a261e37baab14aac549e642": {
+            "label": {
+                "id": "1a261e37baab14aac549e642[label]",
+                "name": "Label",
+                "value": {
+                    "id": "1a261e37baab14aac549e642[label]",
+                    "name": "Label",
+                    "value": ""
+                }
+            },
+            "source": "def62939b93376138db7c3d9",
+            "target": "7ba854b84e9ce94cff1f91c6",
             "attributes": {},
             "type": "Bi-Dir-Association"
         }
