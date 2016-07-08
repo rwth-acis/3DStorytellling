@@ -11,6 +11,10 @@ narrator.iwcClient;
 narrator.editorMode;
 narrator.maskMode;
 
+/**
+ * Initializes the narrator's logic
+ * @param {bool} editorMode
+ */
 narrator.init = function (editorMode) {
   var me = this;
   narrator.editorMode = editorMode;
@@ -36,6 +40,9 @@ narrator.init = function (editorMode) {
   
 };
 
+/**
+ * Callback for IWC
+ */
 narrator.iwcCallback = function (intent) {
   console.log("NARRATOR RECEIVED", intent);
   switch (intent.action) {
@@ -58,11 +65,18 @@ narrator.iwcEmit = function (type, data) {
   }
 };
 
+/**
+ * Creates the story of the pure yjs data
+ * @param {obj} story - yjs representation of the story graph
+ */
 narrator.initStory = function (story) {
   this.story = new Story(story);
   narrator.refresh();
 };
 
+/**
+ * Displays the story. Only call, when there _is_ a story
+ */
 narrator.bindStory = function () {
   $('#story_title').html(me.story.getName());
   if (window.story_state) {
@@ -74,10 +88,16 @@ narrator.bindStory = function () {
   narrator.storyReady = true;
 };
 
+/**
+ * Callback for when the story changed
+ */
 narrator.storyChanged = function (events) {
   $('#refresh_button').removeAttr('disabled');
 };
 
+/**
+ * Re-initializes the story, keeping the current state if one was set
+ */
 narrator.refresh = function () {
   narrator.story.update(window.y.share.data.get('model'));
   if (narrator.story.isEmpty()) {
@@ -108,12 +128,19 @@ narrator.showNoBegin = function () {
   $('#card_caption').text(lang.NO_BEGIN);
 };
 
+/**
+ * Changes the story page to display
+ * @param {int} id 
+ */
 narrator.goTo = function (id) {
   this.path.push(this.story.getState());
   this.display(id);
   $('#undo_button').removeAttr('disabled');
 };
 
+/**
+ * Walks back one step in the story path
+ */
 narrator.undo = function () {
   this.display(this.path.pop());
   if (this.path.length === 0) {
@@ -121,6 +148,11 @@ narrator.undo = function () {
   }
 };
 
+/**
+ * Displays a media file
+ * @param {int} id 
+ * @param {bool} hide - if true, omit story transition options, that are forbidden by requirements 
+ */
 narrator.display = function (id, hide) {
   if (!hide) {
     this.iwcEmit(conf.intents.story_currentNode, id);
@@ -180,17 +212,32 @@ narrator.display = function (id, hide) {
   $('#cont').animate({ scrollTop: (0) }, 'slow');
 };
 
+/**
+ * places a text into an arbitrary dom-element (use the card_media)
+ * @param {dom} elem 
+ * @param {string} cont
+ */
 narrator.embedText = function (elem, cont) {
   elem.text(cont);
 };
 
-narrator.embedImage = function (elem, cont) {
-  elem.html('<img style="width:100%; height:auto;" src="'+cont+'">');
+/**
+ * embeds an image inside an arbitrary dom-element (use the card_media)
+ * @param {dom} elem 
+ * @param {string} url
+ */
+narrator.embedImage = function (elem, url) {
+  elem.html('<img style="width:100%; height:auto;" src="'+url+'">');
 };
 
-narrator.embedVideo = function (elem, cont) {
-  if (/((https:\/\/)?youtu\.be\/.*)|((https:\/\/)?www\.)?youtube\..*\/watch\?v=.*/.test(cont)) {
-    var split = cont.split('.be/');
+/**
+ * embeds a video inside an arbitrary dom-element (use the card_media)
+ * @param {dom} elem 
+ * @param {string} url - Only youtube links supported atm
+ */
+narrator.embedVideo = function (elem, url) {
+  if (/((https:\/\/)?youtu\.be\/.*)|((https:\/\/)?www\.)?youtube\..*\/watch\?v=.*/.test(url)) {
+    var split = url.split('.be/');
     split = split[split.length-1].split('?v=');
     split = split[split.length-1].split('&t=');
     var video = document.createElement('google-youtube');

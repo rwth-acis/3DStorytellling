@@ -19,6 +19,11 @@ viewer.iwcClient;
 
 viewer.story;
 
+/**
+ * Initializes the viewer's logic
+ * @param {bool} editorMode
+ * @param {int} model - id of the model to show 
+ */
 viewer.init = function (editorMode, model) {
   var me = viewer;
 
@@ -50,6 +55,9 @@ viewer.init = function (editorMode, model) {
   });
 };
 
+/**
+ * Callback for IWC
+ */
 viewer.iwcCallback = function (intent) {
   console.log("VIEWER RECEIVED", intent);
   switch (intent.action) {
@@ -84,10 +92,17 @@ viewer.iwcCallback = function (intent) {
   }
 };
 
+/**
+ * Creates the story of the pure yjs data
+ * @param {obj} story - yjs representation of the story graph
+ */
 viewer.initStory = function (story) {
   viewer.story = new Story(story);
 };
 
+/**
+ * Callback when story graph changed
+ */
 viewer.storyChanged = function (events) {
   viewer.story.update(window.y.share.data.get('model'));
 };
@@ -231,6 +246,10 @@ viewer.handleClick = function (event) {
   viewer.cones.generateCone(viewer.TAGS.TEMP, pos_text, dir_text);
 };
 
+/**
+ * Callback for when a tag is clicked
+ * @param {int} id - id of the tag clicked
+ */
 viewer.handleTagClick = function (id) {
   var attrs = viewer.story.getNodeAttributes(viewer.cones.cones[id].nodeId);
   $('#tag_header').text(attrs[Story.NODES.MEDIA.TAG_NAME]);
@@ -239,8 +258,12 @@ viewer.handleTagClick = function (id) {
 };
 
 viewer.lastView = "";
+/**
+ * Callback for when the camera is moved
+ */
 viewer.handleOrientation = function () {
   var str = viewer.calcCam();
+  // avoid redundant textbox updates. still fails sometimes though (chrome only)
   if (str !== viewer.lastView) {
     viewer.lastView = str;
     $('#curr_view').attr('value', str);

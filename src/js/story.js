@@ -47,31 +47,58 @@ Story.NODES = {
   }
 };
 
+/**
+ * @param {obj} data - yjs story graph from syncmeta
+ */
 Story.prototype.update = function (data) {
   this.data = data;
 };
 
+/**
+ * Sets the state of the story _and_ saves it to the history
+ * @param {int} id
+ */
 Story.prototype.setState = function (id) {
   this.state = id;
   this.visited.push(id);
 };
 
+/**
+ * @return {int} 
+ */
 Story.prototype.getState = function () {
   return this.state;
 };
 
+/**
+ * Defines the story's entry node
+ * @param {int} start 
+ */
 Story.prototype.setStart = function (start) {
   this.start = start;
 };
 
+/**
+ * @return {int} 
+ */
 Story.prototype.getStart = function () {
   return this.start;
 };
 
+/**
+ * Returns the attributes (for nodes)
+ * @param {int} id 
+ * @return {obj} 
+ */
 Story.prototype.getNodeAttributes = function (id) {
   return this.getAttributes(this.data.nodes[id].attributes);
 };
 
+/**
+ * Filters the relevant attributes from the yjs reprentation
+ * @param {obj} attr - yjs node
+ * @return {obj} 
+ */
 Story.prototype.getAttributes = function (attr) {
   if (!attr) {
     return {};
@@ -89,6 +116,9 @@ Story.prototype.getAttributes = function (attr) {
   return res;
 };
 
+/**
+ * @return {bool} true, if there is no graph or it is empty
+ */
 Story.prototype.isEmpty = function () {
   if (!this.data) {
     return true;
@@ -97,14 +127,24 @@ Story.prototype.isEmpty = function () {
   }
 };
 
+/**
+ * @return {string} 
+ */
 Story.prototype.getNodeType = function (id) {
   return this.data.nodes[id].type;
 };
 
+/**
+ * @return {string} 
+ */
 Story.prototype.getEdgeType = function (id) {
   return this.data.edges[id].type;
 };
 
+/**
+ * @param {int} id 
+ * @return {{dir:'1/-1, if edge points away/twoards',target:int,type:string,attributes:obj}}
+ */
 Story.prototype.getAdjacentEdges = function (id) {
   var res = {};
 
@@ -130,6 +170,10 @@ Story.prototype.getAdjacentEdges = function (id) {
   return res;
 };
 
+/**
+ * @param {int} id 
+ * @return {string|null} null, if the node does not have one
+ */
 Story.prototype.getView = function (id) {
   if (this.getNodeType(id) == Story.NODES.TYPES.VIEW) {
     return this.getNodeAttributes(id)[Story.NODES.MEDIA.SETTING];
@@ -149,7 +193,10 @@ Story.prototype.getView = function (id) {
   return null;
 };
 
-
+/**
+ * @param {int} id 
+ * @return {[string]} 
+ */
 Story.prototype.getTags = function (id) {
   var adj = this.getAdjacentEdges(id);
   var res = [];
@@ -176,6 +223,7 @@ Story.prototype.getTags = function (id) {
 /**
  * @param {int} id
  * @param {bool} mask - only return next steps that filfill the requirements
+  * @return {obj} {int:{target:int,name:string}}
  */
 Story.prototype.getStoryTransitions = function (id, mask) {
   var edges = this.getAdjacentEdges(id);
@@ -205,6 +253,11 @@ Story.prototype.getStoryTransitions = function (id, mask) {
   return res;
 };
 
+/**
+ * The nodes that have to be alredy visited in order to visit {{id}}
+ * @param {int} id
+ * @return {[int]} 
+ */
 Story.prototype.getRequirements = function (id) {
   var edges = this.getAdjacentEdges(id);
   var res = [];
@@ -223,6 +276,9 @@ Story.prototype.getRequirements = function (id) {
   return res;
 };
 
+/**
+    * @return {int} root node of the story graph (NOT the start of the story!)
+ */
 Story.prototype.getRoot = function () {
   if (!this.data) {
     return null;
@@ -286,10 +342,16 @@ Story.prototype.fall = function (id) {
   } 
 };
 
+/**
+ * @return {string} the name of the story
+ */
 Story.prototype.getName = function () {
   return this.getNodeAttributes(this.getRoot())[Story.NODES.TITLE];
 };
 
+/**
+ * @return {string|null} first node of the story, or null if there is none
+ */
 Story.prototype.getEntryNode = function () {
   var root = this.getRoot();
   if (!root) {
