@@ -25,7 +25,7 @@
              </head>
              <body>
 
-             <story-viewer></story-viewer>
+             <story-viewer editor='true'></story-viewer>
              
              </body>
     ]]>

@@ -15,9 +15,6 @@ narrator.init = function (editorMode) {
   var me = this;
   narrator.editorMode = editorMode;
   narrator.maskMode = !editorMode;
-  if (!editorMode) {
-    $('#refresh_button').remove();
-  }
 
   // pretend to be the attribute widget, in order to receive the canvas' messages
   me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, me.iwcCallback, "ATTRIBUTE");
