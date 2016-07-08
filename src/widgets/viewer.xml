@@ -31,7 +31,7 @@
              </head>
              <body>
              
-             <obj-viewer model="strat"></obj-viewer>
+             <obj-viewer model="strat" editor="true"></obj-viewer>
              
              </body>
     ]]>

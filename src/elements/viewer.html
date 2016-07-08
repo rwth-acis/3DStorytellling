@@ -40,14 +40,16 @@
              border: none;
          }
         </style>
-        
-        <paper-tabs class="l1" id="tabs" selected={{mode}}>
-            <paper-tab>VIEW</paper-tab>
-            <paper-tab>TAG</paper-tab>
-        </paper-tabs>
+
+        <div hidden$="{{!editor}}">
+            <paper-tabs class="l1" id="tabs" selected={{mode}}>
+                <paper-tab>VIEW</paper-tab>
+                <paper-tab>TAG</paper-tab>
+            </paper-tabs>
+        </div>
 
         <div>
-            <div class="l2">
+            <div hidden$="{{!editor}}" class="l2">
                 <iron-pages selected={{mode}}>
                     <div>
                         <input id="curr_view" onClick="viewer.toClipboard('view');" value='position="0 0 0" orientation="0 0 0 0'>
@@ -70,7 +72,7 @@
                     </div>
                 </paper-dialog>
 
-                <x3d id="elem" width="99vw" height="85vh"> 
+                <x3d id="elem" width="99vw" height$="{{_height3d(editor)}}"> 
                     <scene id="scene"">
                         <navigationInfo type='"any"' id="navType"></navigationInfo>
                         <transform>
@@ -98,11 +100,16 @@
              type: Number,
              value: 0,
              observer: '_modeChanged'
+         },
+         
+         editor: {
+             type : Boolean,
+             value : false
          }
      },
 
      ready: function() {
-         viewer.init(this.model);
+         viewer.init(this.editor, this.model);
      },
 
      _modeChanged: function(index) {
@@ -111,6 +118,10 @@
          } else {
              viewer.enterTagMode();
          }
+     },
+
+     _height3d: function(editor) {
+         return editor ? '85vh' : '100vh';
      }
  });
 </script>

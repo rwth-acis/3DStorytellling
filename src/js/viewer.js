@@ -19,7 +19,7 @@ viewer.iwcClient;
 
 viewer.story;
 
-viewer.init = function (model) {
+viewer.init = function (editorMode, model) {
   var me = viewer;
 
   // pretend to be the attribute widget, in order to receive the canvas' messages
