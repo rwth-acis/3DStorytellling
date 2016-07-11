@@ -45,6 +45,8 @@ narrator.init = function (editorMode) {
  */
 narrator.iwcCallback = function (intent) {
   console.log("NARRATOR RECEIVED", intent);
+  console.log('node hit:', intent.extras.payload.data);
+
   switch (intent.action) {
   case conf.intents.syncmeta:
     var payload = intent.extras.payload.data;
@@ -227,7 +229,9 @@ narrator.embedText = function (elem, cont) {
  * @param {string} url
  */
 narrator.embedImage = function (elem, url) {
-  elem.html('<img style="width:100%; height:auto;" src="'+url+'">');
+  if (url) {
+    elem.html('<img style="width:100%; height:auto;" src="'+url+'">');
+  }
 };
 
 /**
