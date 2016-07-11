@@ -10,7 +10,7 @@
 #project related files
 cp.sh
 assets/
-src/js/lib
+src/js/lib/vendor
 node_modules/
 npp
 npm-debug.log
