@@ -150,13 +150,13 @@ Las2peerWidgetLibrary.prototype.sendSelectNode = function(id, type) {
     selectedEntityId : id,
     selectedEntityType : type});
   var intent = {
-    "component": "MAIN",
+    "component": "ATTRIBUTE",
     "data": "",
     "dataType": "",
     "action": "ACTION_DATA",
     "flags": ["PUBLISH_LOCAL"],
     "extras": {"payload":{"data":{"data":data,"type":"EntitySelectOperation"}, "sender":null, "type":"NonOTOperation"}, "time":time},
-    "sender": this.componentName
+    "sender": "ATTRIBUTE"
   };
   this.iwcClient.publish(intent);
 };
