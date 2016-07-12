@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-  <ModulePrefs title="Story Viewer" description="" author="Jan Benscheid" author_email="benscheid@dbis.rwth-aachen.de" width="400" height="450">
+  <ModulePrefs title="Story Preview" description="" author="Jan Benscheid" author_email="benscheid@dbis.rwth-aachen.de" width="400" height="450">
     <Require feature="opensocial-0.8"/>
     <Require feature="openapp"/>
     <Require feature="dynamic-height"/>
@@ -17,7 +17,7 @@
              <head>
              <meta charset="utf-8">
              <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-             <title>Story Viewer</title>
+             <title>Story Preview</title>
              
              <script src="http://localhost:8082/src/js/lib/vendor/webcomponentsjs/webcomponents-lite.js"></script>
              
@@ -25,7 +25,7 @@
              </head>
              <body>
 
-             <story-viewer></story-viewer>
+             <story-viewer editor="true"></story-viewer>
              
              </body>
     ]]>
