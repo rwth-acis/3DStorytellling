@@ -1,7 +1,7 @@
 var conf = {
   external : {
     ROOT : 'http://localhost:8082/',
-    OBJECT_ROOT : 'http://localhost:8082/assets/',
+    OBJECT_ROOT : 'http://schlossmonster.de/3dst/assets/',
     LAS : ''
   },
   viewer : {

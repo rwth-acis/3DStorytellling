@@ -230,7 +230,7 @@ narrator.embedText = function (elem, cont) {
  */
 narrator.embedImage = function (elem, url) {
   if (url) {
-    elem.html('<img style="width:100%; height:auto;" src="'+url+'">');
+    elem.html('<a href="'+url+'" target="_blank"><img style="width:100%; height:auto;" src="'+url+'"><a>');
   }
 };
 
