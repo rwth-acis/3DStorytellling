@@ -284,13 +284,14 @@ Story.prototype.getRoot = function () {
     return null;
   }
   for (var nodeId in this.data.nodes) {
-    if (!this.data.nodes.hasOwnProperty(nodeId)) {
+    if (!this.data.nodes.hasOwnProperty(nodeId) ||
+        this.getNodeType(nodeId) != Story.NODES.TYPES.SU) {
       continue;
     }
     var is = true;
     var neighbors = this.getAdjacentEdges(nodeId);
     for (var edgeId in neighbors) {
-      if (!neighbors.hasOwnProperty("edge")) {
+      if (!neighbors.hasOwnProperty(edgeId)) {
         continue;
       }
       
@@ -301,10 +302,9 @@ Story.prototype.getRoot = function () {
     }
     if (is) {
       return nodeId;
-    } else {
-      return null;
     }
   }
+  return null;
 };
 
 /**
@@ -346,7 +346,11 @@ Story.prototype.fall = function (id) {
  * @return {string} the name of the story
  */
 Story.prototype.getName = function () {
-  return this.getNodeAttributes(this.getRoot())[Story.NODES.TITLE];
+  var root = this.getRoot();
+  if (!root) {
+    return null;
+  }
+  return this.getNodeAttributes(root)[Story.NODES.TITLE];
 };
 
 /**

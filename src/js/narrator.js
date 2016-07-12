@@ -77,20 +77,6 @@ narrator.initStory = function (story) {
 };
 
 /**
- * Displays the story. Only call, when there _is_ a story
- */
-narrator.bindStory = function () {
-  $('#story_title').html(me.story.getName());
-  if (window.story_state) {
-    me.display(window.story_state);
-  } else {
-    me.display(me.story.getState());
-    window.story_state = me.story.getState();
-  }
-  narrator.storyReady = true;
-};
-
-/**
  * Callback for when the story changed
  */
 narrator.storyChanged = function (events) {
@@ -102,6 +88,7 @@ narrator.storyChanged = function (events) {
  */
 narrator.refresh = function () {
   narrator.story.update(window.y.share.data.get('model'));
+  $('#story_title').text(narrator.story.getName() || lang.NO_NAME);
   if (narrator.story.isEmpty()) {
     narrator.showTutorial();
   } else if (!narrator.story.getState()) {
