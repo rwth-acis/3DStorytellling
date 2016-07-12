@@ -138,6 +138,7 @@ narrator.goTo = function (id) {
   this.path.push(this.story.getState());
   this.display(id);
   $('#undo_button').removeAttr('disabled');
+  narrator.iwcClient.sendSelectNode(id, narrator.story.getNodeType(id));  
 };
 
 /**
