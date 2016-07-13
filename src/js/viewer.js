@@ -66,24 +66,6 @@ viewer.init = function (editorMode, model) {
 viewer.iwcCallback = function (intent) {
   console.log("VIEWER RECEIVED", intent);
   switch (intent.action) {
-  case conf.intents.story_currentNode:
-    // parse and set view
-    var view = viewer.story.getView(intent.data);
-    if (view && conf.regex.view.test(view)) {
-      viewer.changeView(view);
-    }
-
-    // set tags
-    viewer.cones.clear();
-    var tags = viewer.story.getTags(intent.data);
-    console.log(tags);
-    tags.forEach(function(tag) {
-      console.log(tag);
-      if (tag.position && conf.regex.tag.test(tag.position)) {
-        viewer.cones.createFromMeta(tag);
-      }
-    });
-    break;
   case conf.intents.syncmeta:
     var payload = intent.extras.payload.data;
     if (payload.type == conf.operations.entitySelect) {
@@ -92,6 +74,20 @@ viewer.iwcCallback = function (intent) {
       if (view && conf.regex.view.test(view)) {
         viewer.changeView(view);
       }
+
+      // set tags
+      if (Story.NODES.TYPES.MEDIA.includes(data.selectedEntityType) ||
+          data.selectedEntityType == Story.NODES.TYPES.TAG) {
+        viewer.cones.clear();
+      }
+      var tags = viewer.story.getTags(data.selectedEntityId);
+      console.log('TAGS:', tags);
+      tags.forEach(function(tag) {
+        console.log(tag);
+        if (tag.position && conf.regex.tag.test(tag.position)) {
+          viewer.cones.createFromMeta(tag);
+        }
+      });
 
       if (viewer.story.getNodeType(data.selectedEntityId) == Story.NODES.TYPES.TAG) {
         viewer.tagInFocus = data.selectedEntityId;
@@ -329,7 +325,7 @@ viewer.changeView = function (view) {
     existing.attr('set_bind', 'true');
   } else {
     viewer.scene.append(
-      '<Viewpoint id="'+id+'" '+view+' description="camera"></Viewpoint>'
+      '<Viewpoint id="'+id+'" '+view+' description="camera" transitionend="console.log(123)"></Viewpoint>'
     );
     viewer.changeView(view);
   }
@@ -357,10 +353,14 @@ viewer.cones.cones = {};
  */
 viewer.cones.generateCone = function (author, pos, dir, color, size, transparency) {
   var cone = new viewer.cones.cone(author, pos, dir, color, size, transparency);
-  cone.appendToScene(viewer.scene);
-  this.lastCone = cone.getId();
-  this.cones[cone.getId()] = cone;
-  return cone;
+  if (!this.cones.hasOwnProperty(cone.getId())) {
+    cone.appendToScene(viewer.scene);
+    this.lastCone = cone.getId();
+    this.cones[cone.getId()] = cone;
+    return cone;
+  } else {
+    return this.cones[cone.getId()];
+  }
 };
 
 viewer.cones.createFromMeta = function (data) {

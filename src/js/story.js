@@ -198,6 +198,15 @@ Story.prototype.getView = function (id) {
  * @return {[string]} 
  */
 Story.prototype.getTags = function (id) {
+  if (this.getNodeType(id) == Story.NODES.TYPES.TAG) {
+    var attr = this.getNodeAttributes(id);
+    return [{
+      title : attr[Story.NODES.MEDIA.TAG_NAME],
+      position : attr[Story.NODES.MEDIA.TAG_POSITION],
+      description : attr[Story.NODES.MEDIA.TAG_DESCRIPTION],
+      nodeId : id
+    }];
+  }
   var adj = this.getAdjacentEdges(id);
   var res = [];
   for (var edgeId in adj) {

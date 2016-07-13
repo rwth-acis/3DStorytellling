@@ -125,7 +125,6 @@ narrator.goTo = function (id) {
   this.path.push(this.story.getState());
   this.display(id);
   $('#undo_button').removeAttr('disabled');
-  narrator.iwcClient.sendSelectNode(id, narrator.story.getNodeType(id));  
 };
 
 /**
@@ -145,7 +144,7 @@ narrator.undo = function () {
  */
 narrator.display = function (id, hide) {
   if (!hide) {
-    this.iwcEmit(conf.intents.story_currentNode, id);
+    narrator.iwcClient.sendSelectNode(id, narrator.story.getNodeType(id));  
   }
   this.story.setState(id);
   var next = this.story.getStoryTransitions(id, narrator.maskMode);
