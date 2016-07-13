@@ -161,6 +161,84 @@ Las2peerWidgetLibrary.prototype.sendSelectNode = function(id, type) {
   this.iwcClient.publish(intent);
 };
 
+Las2peerWidgetLibrary.prototype.sendAttr = function(node, attr, val) {
+  var time = new Date().getTime();
+  var valArray = val.split('');
+  var arrayLength = valArray.length;
+  var payload = [];
+  payload.length = arrayLength;
+  for (var i = 0; i < arrayLength; i++) {
+    var data = {};
+    data.name = "val:" + node + "["+attr.toLowerCase()+"]";
+    data.position = i;
+    data.type = "insert";
+    data.value = valArray[i];
+    var singlePayload = {};
+    
+    singlePayload.data = data;
+    singlePayload.type = "OTOperation";
+    singlePayload.sender = null;
+    payload[i] = singlePayload;
+  }
+  var intent = {
+    "component": "MAIN",
+    "data": "",
+    "dataType": "",
+    "action": "ACTION_DATA_ARRAY",
+    "flags": ["PUBLISH_LOCAL"],
+    "extras": {"payload":payload, "time":time},
+    "sender": "3D_VIEWER_WIDGET"
+  };
+  this.iwcClient.publish(intent);
+  intent = {
+    "component": "ATTRIBUTE",
+    "data": "",
+    "dataType": "",
+    "action": "ACTION_DATA_ARRAY",
+    "flags": ["PUBLISH_LOCAL"],
+    "extras": {"payload":payload, "time":time},
+    "sender": "3D_VIEWER_WIDGET"
+  };
+  this.iwcClient.publish(intent);
+};
+
+Las2peerWidgetLibrary.prototype.clearAttr = function(node, attr, num) {
+  var time = new Date().getTime();
+  var payload = [];
+  payload.length = num;
+  for (var i = 0; i < num; i++) {
+    var data = {};
+    data.name = "val:" + node + "["+attr.toLowerCase()+"]";
+    data.position = 0;
+    data.type = "delete";
+    var singlePayload = {};
+    
+    singlePayload.data = data;
+    singlePayload.type = "OTOperation";
+    singlePayload.sender = null;
+    payload[i] = singlePayload;
+  }
+  var intent = {
+    "component": "MAIN",
+    "data": "",
+    "dataType": "",
+    "action": "ACTION_DATA_ARRAY",
+    "flags": ["PUBLISH_LOCAL"],
+    "extras": {"payload":payload, "time":time},
+    "sender": "3D_VIEWER_WIDGET"
+  };
+  this.iwcClient.publish(intent);
+  intent = {
+    "component": "ATTRIBUTE",
+    "data": "",
+    "dataType": "",
+    "action": "ACTION_DATA_ARRAY",
+    "flags": ["PUBLISH_LOCAL"],
+    "extras": {"payload":payload, "time":time},
+    "sender": "3D_VIEWER_WIDGET"
+  };
+  this.iwcClient.publish(intent);
+};
 
 /**
  * Convenience function to check if a String ends with a given suffix.

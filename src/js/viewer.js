@@ -19,6 +19,11 @@ viewer.iwcClient;
 
 viewer.story;
 
+// node ID of the tag in focus
+viewer.tagInFocus = null;
+
+viewer.buffer = "";
+
 /**
  * Initializes the viewer's logic
  * @param {bool} editorMode
@@ -87,6 +92,22 @@ viewer.iwcCallback = function (intent) {
       if (view && conf.regex.view.test(view)) {
         viewer.changeView(view);
       }
+
+      if (viewer.story.getNodeType(data.selectedEntityId) == Story.NODES.TYPES.TAG) {
+        viewer.tagInFocus = data.selectedEntityId;
+        $('#curr_tag_button').prop('disabled',false);
+      } else {
+        $('#curr_tag_button').prop('disabled',true);
+        viewer.tagInFocus = null;
+      }
+
+      if (viewer.story.getNodeType(data.selectedEntityId) == Story.NODES.TYPES.VIEW) {
+        viewer.viewInFocus = data.selectedEntityId;
+        $('#curr_view_button').prop('disabled',false);
+      } else {
+        $('#curr_view_button').prop('disabled',true);
+        viewer.viewInFocus = null;
+      }
     }
     break;
   }
@@ -122,7 +143,10 @@ viewer.loadModel = function (id) {
 viewer.onModelLoaded = function () {
   viewer.toStdView();
   viewer.changeView(viewer.calcCam());
-  viewer.elem[0].runtime.addEventListener("viewpointChanged", function(e){console.log(e.position);}, false);
+  viewer.elem[0].runtime.addEventListener("viewpointChanged",
+                                          function(e){
+                                            console.log(e.position);
+                                          }, false);
 };
 
 /**
@@ -135,7 +159,28 @@ viewer.toStdView = function () {
 /**
  * Puts content of text field into clipboard
  */
-viewer.toClipboard = function (type) {
+viewer.toClipboard = function () {
+  if (viewer.tagMode && viewer.tagInFocus) {
+    viewer.iwcClient.
+      clearAttr(viewer.tagInFocus,
+                Story.NODES.MEDIA.TAG_POSITION,
+                viewer.story.getNodeAttributes(viewer.tagInFocus)
+                [Story.NODES.MEDIA.TAG_POSITION].length);
+    viewer.iwcClient.sendAttr(viewer.tagInFocus, Story.NODES.MEDIA.TAG_POSITION, viewer.buffer);
+    return true;
+  } else if (!viewer.tagMode && viewer.viewInFocus) {
+    viewer.iwcClient.
+      clearAttr(viewer.viewInFocus,
+                Story.NODES.MEDIA.SETTING,
+                viewer.story.getNodeAttributes(viewer.viewInFocus)
+                [Story.NODES.MEDIA.SETTING].length);
+    viewer.iwcClient.sendAttr(viewer.viewInFocus, Story.NODES.MEDIA.SETTING, viewer.lastView);
+    return true;
+  } else {
+    return false;
+  }
+};
+viewer.toClipboard_ = function (type) {
 //  $('#curr_'+type).attr('value', text);
   $('#curr_'+type)[0].select();
   try {
@@ -241,6 +286,7 @@ viewer.handleClick = function (event) {
       'orientation="'+dir_text+'"';
   
   $('#curr_tag').attr('value', text);
+  viewer.buffer = text;
 //  $('#curr_tag')[0].select();
   viewer.cones.deleteConesByUser(viewer.TAGS.TEMP);
   viewer.cones.generateCone(viewer.TAGS.TEMP, pos_text, dir_text);
