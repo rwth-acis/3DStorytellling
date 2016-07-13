@@ -251,7 +251,9 @@ viewer.handleClick = function (event) {
  * @param {int} id - id of the tag clicked
  */
 viewer.handleTagClick = function (id) {
-  var attrs = viewer.story.getNodeAttributes(viewer.cones.cones[id].nodeId);
+  var nodeId = viewer.cones.cones[id].nodeId;
+  var attrs = viewer.story.getNodeAttributes(nodeId);
+  viewer.iwcClient.sendSelectNode(nodeId, viewer.story.getNodeType(nodeId));  
   $('#tag_header').text(attrs[Story.NODES.MEDIA.TAG_NAME]);
   $('#tag_text').text(attrs[Story.NODES.MEDIA.TAG_DESCRIPTION]);
   $('#tag_dialog')[0].open();
