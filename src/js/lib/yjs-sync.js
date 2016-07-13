@@ -30,7 +30,7 @@ var yjsSync = function (spaceTitle) {
       data:'Map',
       text:"Text"
     },
-    sourceDir: 'http://localhost:8081/js/lib/vendor'
+    sourceDir: conf.external.ROOT+'src/js/lib/vendor'
   }).then(function (y) {
     deferred.resolve(y);
   });
