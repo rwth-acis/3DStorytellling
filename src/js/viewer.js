@@ -314,23 +314,36 @@ viewer.handleOrientation = function () {
   }
 };
 
+
+viewer.lastViewSet = null;
+
+viewer.currIndex = 0;
+viewer.ring = [];
 /**
  * Moves the camera to a specific point and angle
  * @param {string} view - position="x y z" orientation="x y z t"
  */
 viewer.changeView = function (view) {
-  var id = 'view_'+util.hashString(view);
+  var id = 'view_'+viewer.currIndex;
   var existing = viewer.scene.find('#'+id);
   if (existing.length !== 0) {
-    existing.attr('set_bind', 'true');
-  } else {
-    viewer.scene.append(
-      '<Viewpoint id="'+id+'" '+view+' description="camera" transitionend="console.log(123)"></Viewpoint>'
-    );
-    viewer.changeView(view);
+    existing.remove();
   }
+  viewer.scene.append(
+    '<Viewpoint id="'+id+'" '+view+' description="camera" set_bind="true"></Viewpoint>'
+  );
+  viewer.scene.find('#'+id).attr('set_bind', 'true');
+
+  viewer.currIndex = (viewer.currIndex+1) % 3;
+  viewer.lastViewSet = view;
 };
 
+/**
+ * Moves the camera to the last view that has been explicitly set
+ */
+viewer.toLastView = function () {
+  viewer.changeView(viewer.lastViewSet || viewer.calcCam());
+};
 
 /**
  * Manages the tags (cones) on an object

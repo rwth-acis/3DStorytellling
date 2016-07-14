@@ -11,6 +11,8 @@
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-styles/typography.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-toast/paper-toast.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-dialog/paper-dialog.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/neon-animation/animations/scale-down-animation.html">
 
@@ -42,6 +44,19 @@
              border: none;
          }
         </style>
+        <paper-tooltip for="default_view_button">Reset view</paper-tooltip>
+        <paper-tooltip for="refresh_button">Refresh</paper-tooltip>
+
+        <paper-toolbar class="toolbar">
+            <paper-icon-button icon="menu"></paper-icon-button>
+
+            <span id="story_title" class="title"></span>
+            <paper-icon-button id="default_view_button" icon="arrow-upward" onclick="viewer.toLastView();">
+
+            </paper-icon-button>
+            <div hidden$="{{!editor}}"><paper-icon-button id="refresh_button" icon="refresh" onclick="viewer.refresh();" disabled>
+            </paper-icon-button></div>
+        </paper-toolbar>
 
         <div hidden$="{{!editor}}">
             <paper-tabs class="l1" id="tabs" selected={{mode}}>
@@ -55,14 +70,14 @@
                 <iron-pages selected={{mode}}>
                     <div>
                         <input id="curr_view" onClick="viewer.toClipboard('view');" value='position="0 0 0" orientation="0 0 0 0'>
-                        <button id="curr_view_button" type="button" onclick="viewer.clipboardButton()" disabled>Use</button> 
+                        <button id="curr_view_button" type="button" onclick="viewer.clipboardButton()" disabled>Save!</button> 
                     </div>
                     <div>
                         <input id="curr_tag" onClick="viewer.toClipboard('tag');" value='position="0 0 0" orientation="0 0 0 0'>
-                        <button id="curr_tag_button" type="button" onclick="viewer.clipboardButton()" disabled>Use</button> 
+                        <button id="curr_tag_button" type="button" onclick="viewer.clipboardButton()" disabled>Save!</button> 
                     </div>
                 </iron-pages>
-                <paper-toast id="toast_cp" class="toast" text="Press the save button to apply"></paper-toast>
+                <paper-toast id="toast_cp" class="toast" text="Press the save button (above the canvas) to apply"></paper-toast>
                 <paper-toast id="toast_cp_fail" class="toast_bad" text="An error occurred"></paper-toast>
             </div>
             <div id="div_3d">
@@ -123,7 +138,7 @@
      },
 
      _height3d: function(editor) {
-         return editor ? '85vh' : '100vh';
+         return editor ? '70vh' : '100vh';
      }
  });
 </script>
