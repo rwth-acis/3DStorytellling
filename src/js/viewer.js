@@ -19,6 +19,8 @@ viewer.iwcClient;
 
 viewer.story;
 
+viewer.stdView = null;
+
 // node ID of the tag in focus
 viewer.tagInFocus = null;
 
@@ -73,6 +75,8 @@ viewer.iwcCallback = function (intent) {
       var view = viewer.story.getView(data.selectedEntityId);
       if (view && conf.regex.view.test(view)) {
         viewer.changeView(view);
+      } else {
+        viewer.changeView('default');
       }
 
       // set tags
@@ -138,11 +142,8 @@ viewer.loadModel = function (id) {
  */
 viewer.onModelLoaded = function () {
   viewer.toStdView();
-  viewer.changeView(viewer.calcCam());
-  viewer.elem[0].runtime.addEventListener("viewpointChanged",
-                                          function(e){
-                                            console.log(e.position);
-                                          }, false);
+//  viewer.changeView(viewer.calcCam());
+//  viewer.elem[0].runtime.addEventListener("transitionend", viewer.test, false);
 };
 
 /**
@@ -324,17 +325,23 @@ viewer.ring = [];
  * @param {string} view - position="x y z" orientation="x y z t"
  */
 viewer.changeView = function (view) {
-  var id = 'view_'+viewer.currIndex;
-  var existing = viewer.scene.find('#'+id);
-  if (existing.length !== 0) {
-    existing.remove();
-  }
-  viewer.scene.append(
-    '<Viewpoint id="'+id+'" '+view+' description="camera" set_bind="true"></Viewpoint>'
-  );
-  viewer.scene.find('#'+id).attr('set_bind', 'true');
 
-  viewer.currIndex = (viewer.currIndex+1) % 3;
+  console.log('VIEW IS', view);
+  if (view == 'default') {
+    viewer.toStdView();
+  } else {
+    var id = 'view_'+viewer.currIndex;
+    var existing = viewer.scene.find('#'+id);
+    if (existing.length !== 0) {
+      existing.remove();
+    }
+    viewer.scene.append(
+      '<Viewpoint id="'+id+'" '+view+' description="camera" set_bind="true"></Viewpoint>'
+    );
+    viewer.scene.find('#'+id).attr('set_bind', 'true');
+    viewer.currIndex = (viewer.currIndex+1) % 3;
+  }
+
   viewer.lastViewSet = view;
 };
 

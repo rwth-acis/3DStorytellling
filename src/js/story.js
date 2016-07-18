@@ -40,8 +40,8 @@ Story.NODES = {
     TEXT : "Text",
     IMAGE : "URL",
     VIDEO : "URL",
-    SETTING : "View",
-    TAG_POSITION : "Tag",
+    SETTING : "meta",
+    TAG_POSITION : "meta",
     TAG_NAME : "Title",
     TAG_DESCRIPTION : "Description"
   }
