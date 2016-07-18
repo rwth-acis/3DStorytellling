@@ -444,6 +444,44 @@
                                 "name": "",
                                 "value": "hidden"
                             }
+                        },
+                        "9056e7e48fa97518bb2e7b56": {
+                            "id": "9056e7e48fa97518bb2e7b56",
+                            "name": "9056e7e48fa97518bb2e7b56",
+                            "key": {
+                                "id": "9056e7e48fa97518bb2e7b56[key]",
+                                "name": "",
+                                "value": "Tag"
+                            },
+                            "value": {
+                                "id": "9056e7e48fa97518bb2e7b56[value]",
+                                "name": "",
+                                "value": "string"
+                            },
+                            "value2": {
+                                "id": "9056e7e48fa97518bb2e7b56[value2]",
+                                "name": "",
+                                "value": "hidden"
+                            }
+                        },
+                        "38f4431fdb2aeec86e54f4ab": {
+                            "id": "38f4431fdb2aeec86e54f4ab",
+                            "name": "38f4431fdb2aeec86e54f4ab",
+                            "key": {
+                                "id": "38f4431fdb2aeec86e54f4ab[key]",
+                                "name": "",
+                                "value": "Show in story widget"
+                            },
+                            "value": {
+                                "id": "38f4431fdb2aeec86e54f4ab[value]",
+                                "name": "",
+                                "value": "boolean"
+                            },
+                            "value2": {
+                                "id": "38f4431fdb2aeec86e54f4ab[value2]",
+                                "name": "",
+                                "value": "hidden"
+                            }
                         }
                     }
                 }
@@ -459,8 +497,8 @@
                     "value": "Media Object"
                 }
             },
-            "left": 5348,
-            "top": 4730,
+            "left": 5393,
+            "top": 4705,
             "width": 150,
             "height": 100,
             "zIndex": 16010,
@@ -723,7 +761,7 @@
                     "value": {
                         "id": "86963238bbabc9f5f4f9abd0[color]",
                         "name": "Color",
-                        "value": "lightyellow"
+                        "value": "#ffff99"
                     }
                 },
                 "86963238bbabc9f5f4f9abd0[defaultWidth]": {
@@ -942,7 +980,7 @@
                             "key": {
                                 "id": "400020c1cd610ddfcb091c65[key]",
                                 "name": "",
-                                "value": "View"
+                                "value": "meta"
                             },
                             "value": {
                                 "id": "400020c1cd610ddfcb091c65[value]",
@@ -1004,16 +1042,44 @@
                                 "value": "string"
                             }
                         },
-                        "ae6930b066d709cc0884891b": {
-                            "id": "ae6930b066d709cc0884891b",
-                            "name": "ae6930b066d709cc0884891b",
+                        "62787bdbae5d3a40d4962ff5": {
+                            "id": "62787bdbae5d3a40d4962ff5",
+                            "name": "62787bdbae5d3a40d4962ff5",
                             "key": {
-                                "id": "ae6930b066d709cc0884891b[key]",
+                                "id": "62787bdbae5d3a40d4962ff5[key]",
                                 "name": "",
-                                "value": "Tag"
+                                "value": "Color"
                             },
                             "value": {
-                                "id": "ae6930b066d709cc0884891b[value]",
+                                "id": "62787bdbae5d3a40d4962ff5[value]",
+                                "name": "",
+                                "value": "string"
+                            }
+                        },
+                        "e309e5f5e2710e52a4bde826": {
+                            "id": "e309e5f5e2710e52a4bde826",
+                            "name": "e309e5f5e2710e52a4bde826",
+                            "key": {
+                                "id": "e309e5f5e2710e52a4bde826[key]",
+                                "name": "",
+                                "value": "Media"
+                            },
+                            "value": {
+                                "id": "e309e5f5e2710e52a4bde826[value]",
+                                "name": "",
+                                "value": "string"
+                            }
+                        },
+                        "a8548bc809ab52202a8fc94c": {
+                            "id": "a8548bc809ab52202a8fc94c",
+                            "name": "a8548bc809ab52202a8fc94c",
+                            "key": {
+                                "id": "a8548bc809ab52202a8fc94c[key]",
+                                "name": "",
+                                "value": "meta"
+                            },
+                            "value": {
+                                "id": "a8548bc809ab52202a8fc94c[value]",
                                 "name": "",
                                 "value": "string"
                             }
@@ -1519,7 +1585,7 @@
                     "value": {
                         "id": "7ba854b84e9ce94cff1f91c6[overlay]",
                         "name": "Overlay Text",
-                        "value": ""
+                        "value": "requires"
                     }
                 },
                 "7ba854b84e9ce94cff1f91c6[overlayPosition]": {
