@@ -43,7 +43,9 @@ Story.NODES = {
     SETTING : "meta",
     TAG_POSITION : "meta",
     TAG_NAME : "Title",
-    TAG_DESCRIPTION : "Description"
+    TAG_DESCRIPTION : "Description",
+    TAG_COLOR : "Color",
+    TRANSITION_TAG : "Tag"
   }
 };
 
@@ -95,6 +97,19 @@ Story.prototype.getNodeAttributes = function (id) {
 };
 
 /**
+ * Returns the attributes (for any entity)
+ * @param {int} id 
+ * @return {obj} 
+ */
+Story.prototype.getAnyAttributes = function (id) {
+  if (this.isNode(id)) {
+    return this.getAttributes(this.data.nodes[id].attributes);
+  } else {
+    return this.getAttributes(this.data.edges[id].attributes);
+  }
+};
+
+/**
  * Filters the relevant attributes from the yjs reprentation
  * @param {obj} attr - yjs node
  * @return {obj} 
@@ -139,6 +154,24 @@ Story.prototype.getNodeType = function (id) {
  */
 Story.prototype.getEdgeType = function (id) {
   return this.data.edges[id].type;
+};
+
+/**
+ * @return {string} 
+ */
+Story.prototype.getEntityType = function (id) {
+  if (this.data.nodes.hasOwnProperty(id)) {
+    return this.getNodeType(id);
+  } else if (this.data.edges.hasOwnProperty(id)) {
+    return this.getEdgeType(id);
+  }
+};
+
+/**
+ * @return {bool} 
+ */
+Story.prototype.isNode = function (id) {
+  return this.data.nodes.hasOwnProperty(id);
 };
 
 /**
@@ -204,6 +237,7 @@ Story.prototype.getTags = function (id) {
       title : attr[Story.NODES.MEDIA.TAG_NAME],
       position : attr[Story.NODES.MEDIA.TAG_POSITION],
       description : attr[Story.NODES.MEDIA.TAG_DESCRIPTION],
+      color : attr[Story.NODES.MEDIA.TAG_COLOR],
       nodeId : id
     }];
   }
@@ -221,6 +255,7 @@ Story.prototype.getTags = function (id) {
         title : attr[Story.NODES.MEDIA.TAG_NAME],
         position : attr[Story.NODES.MEDIA.TAG_POSITION],
         description : attr[Story.NODES.MEDIA.TAG_DESCRIPTION],
+        color : attr[Story.NODES.MEDIA.TAG_COLOR],
         nodeId : curr
       }); 
     }
@@ -254,7 +289,8 @@ Story.prototype.getStoryTransitions = function (id, mask) {
 
       res[edgeId] = {
         target : curr.target,
-        name : curr.attributes[Story.EDGES.NAME]
+        name : curr.attributes[Story.EDGES.NAME],
+        tag : curr.attributes[Story.NODES.MEDIA.TRANSITION_TAG]
       }
     }
   }

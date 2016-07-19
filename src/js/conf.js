@@ -9,7 +9,11 @@ var conf = {
     TAG_OUTPUT_PRECISION : 3,
     cones : {
       CONE_COLOR : '0 1 0',
-      CONE_SIZE : 3
+      CONE_COLOR_SELECT : '0 0.4 1',
+      CONE_COLOR_LINK : '1 0.4 0',
+      CONE_SIZE : 3,
+      TRANSPARENCY_DEFAULT : 0.3,
+      TRANSPARENCY_HIGHLIGHT : 0.1
     }
   },
   intents : {

@@ -24,7 +24,12 @@ viewer.stdView = null;
 // node ID of the tag in focus
 viewer.tagInFocus = null;
 
+viewer.targetAttr = null;
+
 viewer.buffer = "";
+
+viewer.editorMode;
+viewer.maskMode;
 
 /**
  * Initializes the viewer's logic
@@ -33,6 +38,8 @@ viewer.buffer = "";
  */
 viewer.init = function (editorMode, model) {
   var me = viewer;
+  viewer.editorMode = editorMode;
+  viewer.maskMode = !editorMode;
 
   // pretend to be the attribute widget, in order to receive the canvas' messages
   me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, viewer.iwcCallback, "ATTRIBUTE");
@@ -72,41 +79,103 @@ viewer.iwcCallback = function (intent) {
     var payload = intent.extras.payload.data;
     if (payload.type == conf.operations.entitySelect) {
       var data = JSON.parse(payload.data);
-      var view = viewer.story.getView(data.selectedEntityId);
-      if (view && conf.regex.view.test(view)) {
-        viewer.changeView(view);
-      } else {
-        viewer.changeView('default');
-      }
+      var id = data.selectedEntityId;
+      var clearedTags = false;
 
-      // set tags
-      if (Story.NODES.TYPES.MEDIA.includes(data.selectedEntityType) ||
-          data.selectedEntityType == Story.NODES.TYPES.TAG) {
-        viewer.cones.clear();
-      }
-      var tags = viewer.story.getTags(data.selectedEntityId);
-      console.log('TAGS:', tags);
-      tags.forEach(function(tag) {
-        console.log(tag);
-        if (tag.position && conf.regex.tag.test(tag.position)) {
-          viewer.cones.createFromMeta(tag);
+      function clearTags() {
+        if (!clearedTags) {
+          viewer.cones.clear();
+          clearedTags = true;
         }
-      });
+      }
 
-      if (viewer.story.getNodeType(data.selectedEntityId) == Story.NODES.TYPES.TAG) {
-        viewer.tagInFocus = data.selectedEntityId;
+      function updateView(id) {
+        var view = viewer.story.getView(id);
+        if (view && conf.regex.view.test(view)) {
+          viewer.changeView(view);
+        } else {
+          viewer.changeView('default');
+        }
+      }
+
+      function updateTags(id) {
+        var tags = viewer.story.getTags(id);
+        console.log('TAGS:', tags);
+        tags.forEach(function(tag) {
+          if (tag.position && conf.regex.tag.test(tag.position)) {
+            viewer.cones.createFromMeta(tag);
+          }
+        });
+      }
+
+      function updateTransitionTags(id) {
+        var next = viewer.story.getStoryTransitions(id, viewer.maskMode);
+        for (var edgeId in next) {
+          console.log('next', next[edgeId]);
+          if (next[edgeId].tag && conf.regex.tag.test(next[edgeId].tag)) {
+            viewer.cones.createFromMeta({position : next[edgeId].tag,
+                                         nodeId : edgeId,
+                                         color : conf.viewer.cones.CONE_COLOR_LINK});
+          }
+        } 
+      }
+
+      function selectTag(id) {
+        viewer.unhighlightAll();
+        var cone = viewer.cones.search(id);
+        if (cone) {
+          viewer.handleTagHover(cone.id);
+        }
+      }
+      
+      if (viewer.story.isNode(id)) {
+        var nodeType = viewer.story.getNodeType(id);
+        var isMedia = Story.NODES.TYPES.MEDIA.includes(nodeType);
+        if (isMedia) {
+          clearTags();
+          updateTransitionTags(id);
+          viewer.story.setState(id);
+        }
+        
+        if (isMedia || nodeType == Story.NODES.TYPES.VIEW) {
+          updateView(id);
+        }
+        
+        if (isMedia || nodeType == Story.NODES.TYPES.TAG) {
+          updateTags(id);
+        }
+
+      }
+      
+      selectTag(id);
+
+      var nodeType = viewer.story.getEntityType(id);
+
+      if (nodeType == Story.NODES.TYPES.TAG ||
+          nodeType == Story.EDGES.TYPES.TRANSITION) {
+        viewer.tagInFocus = id;
         $('#curr_tag_button').prop('disabled',false);
       } else {
         $('#curr_tag_button').prop('disabled',true);
         viewer.tagInFocus = null;
       }
 
-      if (viewer.story.getNodeType(data.selectedEntityId) == Story.NODES.TYPES.VIEW) {
-        viewer.viewInFocus = data.selectedEntityId;
+      if (nodeType == Story.NODES.TYPES.VIEW) {
+        viewer.viewInFocus = id;
+        viewer.targetAttr = Story.NODES.MEDIA.SETTING;
         $('#curr_view_button').prop('disabled',false);
       } else {
         $('#curr_view_button').prop('disabled',true);
         viewer.viewInFocus = null;
+      }
+
+      switch (nodeType) {
+      case Story.NODES.TYPES.VIEW:
+        viewer.targetAttr=Story.NODES.MEDIA.SETTING; break;
+      case Story.NODES.TYPES.TAG:
+        viewer.targetAttr = Story.NODES.MEDIA.TAG_POSITION; break;
+      case Story.EDGES.TYPES.TRANSITION:
+        viewer.targetAttr = Story.NODES.MEDIA.TRANSITION_TAG; break;
       }
     }
     break;
@@ -159,11 +228,9 @@ viewer.toStdView = function () {
 viewer.toClipboard = function () {
   if (viewer.tagMode && viewer.tagInFocus) {
     viewer.iwcClient.
-      clearAttr(viewer.tagInFocus,
-                Story.NODES.MEDIA.TAG_POSITION,
-                viewer.story.getNodeAttributes(viewer.tagInFocus)
-                [Story.NODES.MEDIA.TAG_POSITION].length);
-    viewer.iwcClient.sendAttr(viewer.tagInFocus, Story.NODES.MEDIA.TAG_POSITION, viewer.buffer);
+      clearAttr(viewer.tagInFocus, viewer.targetAttr,
+                viewer.story.getAnyAttributes(viewer.tagInFocus)[viewer.targetAttr].length);
+    viewer.iwcClient.sendAttr(viewer.tagInFocus, viewer.targetAttr, viewer.buffer);
     return true;
   } else if (!viewer.tagMode && viewer.viewInFocus) {
     viewer.iwcClient.
@@ -286,7 +353,8 @@ viewer.handleClick = function (event) {
   viewer.buffer = text;
 //  $('#curr_tag')[0].select();
   viewer.cones.deleteConesByUser(viewer.TAGS.TEMP);
-  viewer.cones.generateCone(viewer.TAGS.TEMP, pos_text, dir_text);
+  viewer.cones.generateCone(viewer.TAGS.TEMP, pos_text, dir_text,
+                            conf.viewer.cones.CONE_COLOR_SELECT);
 };
 
 /**
@@ -295,11 +363,38 @@ viewer.handleClick = function (event) {
  */
 viewer.handleTagClick = function (id) {
   var nodeId = viewer.cones.cones[id].nodeId;
-  var attrs = viewer.story.getNodeAttributes(nodeId);
-  viewer.iwcClient.sendSelectNode(nodeId, viewer.story.getNodeType(nodeId));  
-  $('#tag_header').text(attrs[Story.NODES.MEDIA.TAG_NAME]);
-  $('#tag_text').text(attrs[Story.NODES.MEDIA.TAG_DESCRIPTION]);
-  $('#tag_dialog')[0].open();
+  var attrs = viewer.story.getAnyAttributes(nodeId);
+  if (viewer.story.isNode(nodeId)) {
+    viewer.iwcClient.sendSelectNode(nodeId, viewer.story.getNodeType(nodeId));  
+    $('#tag_header').text(attrs[Story.NODES.MEDIA.TAG_NAME]);
+    $('#tag_text').text(attrs[Story.NODES.MEDIA.TAG_DESCRIPTION]);
+    $('#tag_dialog')[0].open();
+  } else {
+//    viewer.iwcClient.sendSelectNode(nodeId, viewer.story.getEdgeType(nodeId));
+    var adj = viewer.story.getAdjacentEdges(viewer.story.getState());
+    if (adj[nodeId]) {
+      viewer.iwcClient.sendSelectNode(adj[nodeId].target,
+                               viewer.story.getNodeType(adj[nodeId].target));
+    }
+  }
+};
+
+
+// TODO: Move these functions to the tag object
+viewer.handleTagHover = function (id) {
+  viewer.cones.cones[id].highlight();
+};
+
+viewer.handleTagLeave = function (id) {
+  viewer.cones.cones[id].unhighlight();
+};
+
+viewer.unhighlightAll = function () {
+  for (var id in viewer.cones.cones) {
+    if (viewer.cones.cones.hasOwnProperty(id)) {
+      viewer.cones.cones[id].unhighlight();
+    }
+  }
 };
 
 viewer.lastView = "";
@@ -385,8 +480,19 @@ viewer.cones.generateCone = function (author, pos, dir, color, size, transparenc
 
 viewer.cones.createFromMeta = function (data) {
   var info = data.position.split('"');
-  var cone = this.generateCone(null, info[1], info[3]);
+  var cone = this.generateCone(null, info[1], info[3], data.color);
   cone.nodeId = data.nodeId;
+};
+
+viewer.cones.search = function (nodeId) {
+  for (var id in this.cones) {
+    if (this.cones.hasOwnProperty(id)) {
+      if (this.cones[id].nodeId == nodeId) {
+        return this.cones[id];
+      }
+    }
+  }
+  return null
 };
 
 /**
@@ -394,12 +500,10 @@ viewer.cones.createFromMeta = function (data) {
  */
 viewer.cones.deleteConesByUser = function (user) {  
   for (var id in this.cones) {
-    if (!this.cones.hasOwnProperty(id)) {
-      continue;
-    }
-
-    if (this.cones[id].author == viewer.TAGS.TEMP) {
-      this.deleteCone(id);      
+    if (this.cones.hasOwnProperty(id)) {
+      if (this.cones[id].author == viewer.TAGS.TEMP) {
+        this.deleteCone(id);      
+      }
     }
   }
 };
@@ -432,9 +536,8 @@ viewer.cones.clear = function () {
  * @param {string} dir - Surface normal in "x y z"
  * @param {string} color - Color in "r g b"
  * @param {float} size - Size
- * @param {float} transparency - Transparency
  */
-viewer.cones.cone = function (author, pos, dir, color, size, transparency) {
+viewer.cones.cone = function (author, pos, dir, color, size) {
   var pos = pos || '0 0 0';
   var dir = dir || '0 -1 0';
 
@@ -450,9 +553,12 @@ viewer.cones.cone = function (author, pos, dir, color, size, transparency) {
   var tag = 'cone_' + id;
   var html =
       "<transform id='" + tag + "' translation='" + pos + "' center='0 1 0' scale ='"+size+' '+size*2+' '+size+"' rotation='"+dirvec.toString()+" "+Math.PI+"'>" +
-      "<shape onclick='viewer.handleTagClick("+id+");'>" +
+      "<shape onclick='viewer.handleTagClick("+id+");' " +
+      "onmouseover='viewer.handleTagHover("+id+");' " +
+      "onmouseout='viewer.handleTagLeave("+id+");'>" +
       "<appearance>" +
-      "<material diffuseColor='" + color + "' transparency='0.5'></material>" +
+      "<material id='color' diffuseColor='" + color + "' "+
+      "transparency='"+conf.viewer.cones.TRANSPARENCY_DEFAULT+"'></material>" +
       "</appearance>" +
       "<cone></cone>" +
       "</shape>" +
@@ -462,6 +568,7 @@ viewer.cones.cone = function (author, pos, dir, color, size, transparency) {
   this.tag = tag;
   this.html = html;
   this.author = author;
+  this.size = size;
 };
 
 /**
@@ -485,4 +592,16 @@ viewer.cones.cone.prototype.appendToScene = function (scene) {
  */
 viewer.cones.cone.prototype.removeFromScene = function () {
   this.scene.find('#'+this.tag).remove();
+};
+
+viewer.cones.cone.prototype.highlight = function () {
+  this.scene.find('#'+this.tag).find('#color').attr(
+    'transparency', conf.viewer.cones.TRANSPARENCY_HIGHLIGHT
+  );
+};
+
+viewer.cones.cone.prototype.unhighlight = function () {
+  this.scene.find('#'+this.tag).find('#color').attr(
+    'transparency', conf.viewer.cones.TRANSPARENCY_DEFAULT
+  );
 };
