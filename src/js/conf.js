@@ -24,7 +24,10 @@ var conf = {
     entitySelect : "EntitySelectOperation"
   },
   regex : {
-    view : /position=".*" orientation=".*"( centerOfRotation=".*")?/,
-    tag : /position=".*" orientation=".*"/
-  }
+    view : /^position=".*" orientation=".*"( centerOfRotation=".*")?$/,
+    tag : /^position=".*" orientation=".*"$/,
+    video : /^((https:\/\/)?youtu\.be\/.*)|((https:\/\/)?www\.)?youtube\..*\/watch\?v=.*$/,
+    image : /^.*((\.jpg)|(\.png)|(\.gif))$/,
+    audio : /^.*((\.mp3)|(\.ogg))$/
+  }  
 };

@@ -371,7 +371,16 @@ viewer.handleTagClick = function (id) {
   if (viewer.story.isNode(nodeId)) {
     viewer.iwcClient.sendSelectNode(nodeId, viewer.story.getNodeType(nodeId));  
     $('#tag_header').text(attrs[Story.NODES.MEDIA.TAG_NAME]);
-    $('#tag_text').text(attrs[Story.NODES.MEDIA.TAG_DESCRIPTION]);
+    var media = attrs[Story.NODES.MEDIA.TAG_MEDIA];
+    $('#tag_text').html('');
+    if (conf.regex.image.test(media)) {
+      util.embedImage($('#tag_text'), media);
+    } else if (conf.regex.video.test(media)) {
+      util.embedVideo($('#tag_text'), media);
+    } else if (conf.regex.audio.test(media)) {
+      util.embedAudio($('#tag_text'), media);
+    }
+    $('#tag_text').append(attrs[Story.NODES.MEDIA.TAG_DESCRIPTION]);
     $('#tag_dialog')[0].open();
   } else {
 //    viewer.iwcClient.sendSelectNode(nodeId, viewer.story.getEdgeType(nodeId));

@@ -173,13 +173,13 @@ narrator.display = function (id, hide) {
   var mediaElem = $('#card_media');
   switch (this.story.getNodeType(id)) {
   case Story.NODES.TYPES.TEXT:
-    this.embedText(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.TEXT]);
+    util.embedText(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.TEXT]);
     break;
   case Story.NODES.TYPES.IMAGE:
-    this.embedImage(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.IMAGE]);
+    util.embedImage(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.IMAGE]);
     break;
   case Story.NODES.TYPES.VIDEO:
-    this.embedVideo(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.VIDEO]);
+    util.embedVideo(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.VIDEO]);
     break;    
   }
   
@@ -199,43 +199,4 @@ narrator.display = function (id, hide) {
   }
   
   $('#cont').animate({ scrollTop: (0) }, 'slow');
-};
-
-/**
- * places a text into an arbitrary dom-element (use the card_media)
- * @param {dom} elem 
- * @param {string} cont
- */
-narrator.embedText = function (elem, cont) {
-  elem.text(cont);
-};
-
-/**
- * embeds an image inside an arbitrary dom-element (use the card_media)
- * @param {dom} elem 
- * @param {string} url
- */
-narrator.embedImage = function (elem, url) {
-  if (url) {
-    elem.html('<a href="'+url+'" target="_blank"><img style="width:100%; height:auto;" src="'+url+'"><a>');
-  }
-};
-
-/**
- * embeds a video inside an arbitrary dom-element (use the card_media)
- * @param {dom} elem 
- * @param {string} url - Only youtube links supported atm
- */
-narrator.embedVideo = function (elem, url) {
-  if (/((https:\/\/)?youtu\.be\/.*)|((https:\/\/)?www\.)?youtube\..*\/watch\?v=.*/.test(url)) {
-    var split = url.split('.be/');
-    split = split[split.length-1].split('?v=');
-    split = split[split.length-1].split('&t=');
-    var video = document.createElement('google-youtube');
-    video.setAttribute('video-id', split[0]);
-    video.setAttribute('fluid', "true");
-    video.setAttribute('rel', "0");
-    video.setAttribute('width', "100%");
-    elem.append(video);
-  }
 };

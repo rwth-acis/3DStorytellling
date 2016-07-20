@@ -45,6 +45,7 @@ Story.NODES = {
     TAG_NAME : "Title",
     TAG_DESCRIPTION : "Description",
     TAG_COLOR : "Color",
+    TAG_MEDIA : "Media",
     TRANSITION_TAG : "Tag"
   }
 };
