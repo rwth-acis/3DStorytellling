@@ -1,3 +1,6 @@
+var mouseX = 0;
+var mouseY = 0;
+
 var viewer = {};
 
 viewer.TAGS = {
@@ -362,6 +365,7 @@ viewer.handleClick = function (event) {
  * @param {int} id - id of the tag clicked
  */
 viewer.handleTagClick = function (id) {
+  $('#follower').css({visibility: 'hidden'});
   var nodeId = viewer.cones.cones[id].nodeId;
   var attrs = viewer.story.getAnyAttributes(nodeId);
   if (viewer.story.isNode(nodeId)) {
@@ -382,11 +386,24 @@ viewer.handleTagClick = function (id) {
 
 // TODO: Move these functions to the tag object
 viewer.handleTagHover = function (id) {
+  var nodeId = viewer.cones.cones[id].nodeId;
   viewer.cones.cones[id].highlight();
+  $('#follower').css({visibility: 'visible'});
+  if (!viewer.story.isNode(nodeId)) {
+    $('#follower').html('&rarr; '+
+      viewer.story.getAnyAttributes(nodeId)[Story.EDGES.NAME]
+    );
+  } else {
+    $('#follower').text(
+      viewer.story.getAnyAttributes(nodeId)[Story.NODES.MEDIA.TAG_NAME]
+    );
+  }
 };
 
 viewer.handleTagLeave = function (id) {
+  var nodeId = viewer.cones.cones[id].nodeId;
   viewer.cones.cones[id].unhighlight();
+  $('#follower').css({visibility: 'hidden'});
 };
 
 viewer.unhighlightAll = function () {
@@ -401,13 +418,14 @@ viewer.lastView = "";
 /**
  * Callback for when the camera is moved
  */
-viewer.handleOrientation = function () {
+viewer.handleOrientation = function (e) {
   var str = viewer.calcCam();
   // avoid redundant textbox updates. still fails sometimes though (chrome only)
   if (str !== viewer.lastView) {
     viewer.lastView = str;
     $('#curr_view').attr('value', str);
   }
+  $('#follower').css({left:e.clientX, top:e.clientY});
 };
 
 

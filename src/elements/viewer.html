@@ -43,6 +43,16 @@
          #elem {
              border: none;
          }
+         #follower{
+             position: absolute;
+             padding: 4px;
+             background-color: white;
+             transform-origin: 100% 0;
+             margin-bottom: 20px;
+             margin-left: 20px;
+             box-shadow: 2px 2px 10px black;
+             visibility: hidden;
+         }
         </style>
         <paper-tooltip for="default_view_button">Reset view</paper-tooltip>
         <paper-tooltip for="refresh_button">Refresh</paper-tooltip>
@@ -77,7 +87,7 @@
                         <button id="curr_tag_button" type="button" onclick="viewer.clipboardButton()" disabled>Save!</button> 
                     </div>
                 </iron-pages>
-                <paper-toast id="toast_cp" class="toast" text="Press the save button (above the canvas) to apply"></paper-toast>
+                <paper-toast id="toast_cp" class="toast_good" text="Press the save button (above the canvas) to apply"></paper-toast>
                 <paper-toast id="toast_cp_fail" class="toast_bad" text="An error occurred"></paper-toast>
             </div>
             <div id="div_3d">
@@ -98,6 +108,7 @@
                     </scene> 
                 </x3d>
             </div>
+            <div id="follower">	&rarr; mouse</div>
         </div>
 
     </template>

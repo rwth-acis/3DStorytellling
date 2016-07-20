@@ -16,7 +16,7 @@ Story.EDGES = {
     BME_MEDIA : "Media Connection",
     REQUIREMENT : "Requirement"
   },
-  NAME : "Name"
+  NAME : "Name",
 };
 
 Story.NODES = {
