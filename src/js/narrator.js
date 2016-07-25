@@ -5,7 +5,7 @@ narrator = {};
  * @param {bool} editorMode
  */
 narrator.init = function (eM) {
-  yjsSync().done(function(y) {
+  yjsSync(eM ? conf.y.ROOM_EDITOR : conf.y.ROOM_VIEWER).done(function(y) {
     
     var $undo = $('#undo_button').prop('disabled', true),
         $refresh = $('#refresh_button').prop('disabled', true),
@@ -25,7 +25,6 @@ narrator.init = function (eM) {
 
         _init = function () {
           y.share.data.observe(storyChanged);
-
           window.y = y;
 
           iwcClient =  new Las2peerWidgetLibrary(conf.external.LAS,
@@ -138,7 +137,7 @@ narrator.init = function (eM) {
 
     var showTutorial = function () {
       console.log(conf.external);
-      embedImage($cardMedia, conf.external.ROOT+'img/tut.jpg');
+      util.embedImage($cardMedia, conf.external.ROOT+'img/tut.jpg');
       $cardCaption.text(lang.TUTORIAL);
     };
 

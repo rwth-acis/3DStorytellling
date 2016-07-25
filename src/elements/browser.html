@@ -31,7 +31,7 @@
 <script src="http://localhost:8082/src/js/story.js"></script>
 <script src="http://localhost:8082/src/js/browser.js"></script>
 
-<link rel="stylesheet" type="text/css" href="http://localhost:8082/src/js/lib/x3dom/x3dom.css"></link>
+<link rel="stylesheet" type="text/css" href="http://localhost:8082/src/js/lib/vendor/x3dom/x3dom.css"></link>
 <link rel="import" href="http://localhost:8082/src/css/defaults.html">
 
 <style is="custom-style" include="iron-flex"></style>
@@ -86,6 +86,7 @@
              bottom: 16px;
          }
         </style>
+        
         <paper-tabs class="l1 flex" id="tabs" selected={{mode}}>
             <paper-tab>STORIES</paper-tab>
             <paper-tab>MODELS</paper-tab>
@@ -100,17 +101,37 @@
                                 <div class="pad">
                                     <div class="primary">[[item.name]]</div>
                                     <div class="shortText">by [[item.author]]</div>
-                                    <div class="longText">[[item.description]]</div>
+                                    <div class="longText">[[item.description]]<br>
+                                        <button id="button_load" type="button" on-click="loadStory" ref="[[item.id]]">View</button>
+                                        <button id="button_edit" type="button" on-click="editStory" ref="[[item.id]]">Edit</button>
+                                    </div>
                                 </div>
                             </div>
                         </template>
                     </iron-list>
-                    <paper-fab mini icon="add"></paper-fab>
+                    <paper-fab id="plus_button" mini icon="add"></paper-fab>
                 </div>
                 <div>
                 </div>
             </iron-pages>
         </div>
+
+        <paper-dialog id="loaded_dialog" entry-animation="scale-up-animation" exit-animation="scale-down-animation" style="width: 200px">
+            <h2>Story loaded</h2>
+            <div>Please refresh the page!</div>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Close</paper-button>
+            </div>
+        </paper-dialog>
+        <paper-dialog id="link_dialog" entry-animation="scale-up-animation" exit-animation="scale-down-animation" style="width: 200px">
+            <div>You will now be redirected</div>
+            <div class="buttons">
+            <a id="space_redirector" href="" tabindex="-1" target="_blank">
+                <paper-button raised>Okay</paper-button>
+            </a>
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
     </template>
 </dom-module>
 
@@ -123,10 +144,16 @@
              type: Number,
              value: 0,
              observer: '_modeChanged'
+         },
+         
+         editor: {
+             type : Boolean,
+             value : false
          }
      },
 
      ready: function() {
+         browser.init(this.editor);
          $("#list").scrollTarget = this.ownerDocument.documentElement;
      },
      
@@ -140,7 +167,16 @@
      
      _modeChanged: function(index) {
 
+     },
+
+     loadStory: function(e) {
+         this.fire('loadStory', {id: e.target.ref});
+     },
+
+     editStory: function(e) {
+         this.fire('editStory', {id: e.target.ref});
      }
+
  });
 </script>
 

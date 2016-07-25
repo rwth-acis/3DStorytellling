@@ -1,8 +1,16 @@
 var conf = {
   external : {
     ROOT : 'http://localhost:8082/',
-    OBJECT_ROOT : 'http://schlossmonster.de/3dst/assets/',
+    OBJECT_ROOT : 'http://localhost:8082/assets/',
+    STORY_ROOT : 'http://localhost:8082/assets/',
+    ROLE : 'http://127.0.0.1:8073/',
+    editor : 'storyeditor',
+    viewer : 'storyviewer',
     LAS : ''
+  },
+  y : {
+    ROOM_EDITOR : '3dst_editor',
+    ROOM_VIEWER : '3dst_viewer'
   },
   viewer : {
     CAM_OUTPUT_PRECISION : 3,

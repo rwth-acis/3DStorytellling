@@ -54,7 +54,7 @@ viewer.init = function (editorMode, model) {
     me.elem[0].addEventListener("mousemove", me.handleOrientation, true);
   });
 
-  yjsSync().done(function(y){
+  yjsSync(editorMode ? conf.y.ROOM_EDITOR : conf.y.ROOM_VIEWER).done(function(y){
     
     function initY () {
       window.y = y;
