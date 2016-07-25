@@ -1,202 +1,228 @@
-var narrator = {};
-
-narrator.story;
-
-narrator.storyReady = false;
-
-narrator.path = new Array();
-
-narrator.iwcClient;
-
-narrator.editorMode;
-narrator.maskMode;
+narrator = {};
 
 /**
  * Initializes the narrator's logic
  * @param {bool} editorMode
  */
-narrator.init = function (editorMode) {
-  var me = this;
-  narrator.editorMode = editorMode;
-  narrator.maskMode = !editorMode;
-
-  // pretend to be the attribute widget, in order to receive the canvas' messages
-  me.iwcClient = new Las2peerWidgetLibrary(conf.external.LAS, me.iwcCallback, "ATTRIBUTE");
-
+narrator.init = function (eM) {
   yjsSync().done(function(y) {
-
-    function initY () {
-      window.y = y;
-      console.info('Story Viewer: Yjs successfully initialized');
-      narrator.initStory(y.share.data.get('model'));
-      y.share.data.observe(narrator.storyChanged);
-    }
-    initY();
     
+    var $undo = $('#undo_button').prop('disabled', true),
+        $refresh = $('#refresh_button').prop('disabled', true),
+        $storyTitle = $('#story_title'),
+        $cardTitle = $('#card_title'),
+        $cardCaption = $('#card_caption'),
+        $cardMedia = $('#card_media'),
+        $cardLinks = $('#card_links'),
+        $cont = $('#cont'),
+
+        path = new Array(),
+        story,
+        storyReady = false,
+        iwcClient,
+        editorMode = eM,
+        maskMode = !eM,
+
+        _init = function () {
+          y.share.data.observe(storyChanged);
+
+          window.y = y;
+
+          iwcClient =  new Las2peerWidgetLibrary(conf.external.LAS,
+                                                 iwcCallback,
+                                                 "ATTRIBUTE");
+
+          $undo.on('click', undo);
+          $refresh.on('click', refresh);
+
+          initStory(y.share.data.get('model'));
+          console.info('Story Viewer: Yjs successfully initialized');
+        };
+
+    /**
+     * INITIALIZATION
+     */
+    
+    /**
+     * Creates the story of the pure yjs data
+     * @param {obj} story - yjs representation of the story graph
+     */
+    var initStory = function (s) {
+      story = new Story(s);
+      refresh();
+    };
+    
+    /**
+     * IWC
+     */
+
+    /**
+     * Callback for when the story changed
+     */
+    var storyChanged = function (events) {
+      $refresh.prop('disabled', false)
+    };
+    
+    /**
+     * Callback for IWC
+     */
+    var iwcCallback = function (intent) {
+      console.log("NARRATOR RECEIVED", intent);
+      console.log('node hit:', intent.extras.payload.data);
+
+      switch (intent.action) {
+      case conf.intents.syncmeta:
+        var payload = intent.extras.payload.data;
+        if (payload.type == conf.operations.entitySelect) {
+          var data = JSON.parse(payload.data);
+          var id = data.selectedEntityId;
+          if (Story.NODES.TYPES.MEDIA.includes(story.getNodeType(id))) {
+            display(id, true);
+          }
+        }
+        break;
+      }
+    };
+
+
+    /**
+     * BUTTON FUNCTIONS
+     */
+
+    var undo = function (e) {
+      var prev = path.pop();
+      prev && display(prev);
+      if (path.length === 0) {
+        $undo.prop('disabled', true);
+      }
+    };
+
+    /**
+     * Re-initializes the story, keeping the current state if one was set
+     */
+    var refresh = function (e) {
+      story.update(window.y.share.data.get('model'));
+      $storyTitle.text(story.getName() || lang.NO_NAME);
+      if (story.isEmpty()) {
+        showTutorial();
+      } else if (!story.getState()) {
+        var entry = story.getEntryNode();
+        if (entry) {
+          story.setState(entry);
+          story.setStart(entry);
+          display(story.getState());
+        } else {
+          showNoBegin();
+        }
+      } else {
+        display(story.getState());
+      }
+
+      $refresh.prop('disabled', true);     
+    };
+
+    /**
+     * Changes the story page to display
+     * @param {int} id 
+     */
+    var goTo = function (id) {
+      path.push(story.getState());
+      display(id);
+      $undo.prop('disabled', false);
+    };
+
+    
+    /**
+     * MISC
+     */
+
+    var showTutorial = function () {
+      console.log(conf.external);
+      embedImage($cardMedia, conf.external.ROOT+'img/tut.jpg');
+      $cardCaption.text(lang.TUTORIAL);
+    };
+
+    var showNoBegin = function () {
+      $cardCaption.text(lang.NO_BEGIN);
+    };
+
+
+    /**
+     * Displays a media file
+     * @param {int} id 
+     * @param {bool} hide - no iwc should happen in case story switch was 
+     *                      already caused by one
+     */
+    var display = function (id, hide) {
+      if (!hide) {
+        iwcClient.sendSelectNode(id, story.getNodeType(id));  
+      }
+      story.setState(id);
+      var next = story.getStoryTransitions(id, maskMode);
+      var num = 0;
+      var one = "";
+      for (var edgeId in next) {
+        if (!next.hasOwnProperty(edgeId)) {
+          continue;
+        }
+        
+        num++;
+        one = edgeId;
+        if (next[edgeId].name == "") {
+          next[edgeId].name =
+            story.getNodeAttributes(next[edgeId].target)[Story.NODES.TITLE];
+        }
+      }
+      if (num == 1 &&
+          next[one].name == story.getNodeAttributes(
+            next[one].target)[Story.NODES.TITLE]) {
+        next[one].name = "next";
+      }
+      
+      var curr = story.getNodeAttributes(id);
+
+      $cardTitle.text(curr[Story.NODES.TITLE]);
+
+      $cardMedia.html('');
+      var mediaElem = $cardMedia;
+      var attrs = story.getNodeAttributes(id);
+      switch (story.getNodeType(id)) {
+      case Story.NODES.TYPES.TEXT:
+        util.embedText(mediaElem, attrs[Story.NODES.MEDIA.TEXT]);
+        break;
+      case Story.NODES.TYPES.IMAGE:
+        util.embedImage(mediaElem, attrs[Story.NODES.MEDIA.IMAGE]);
+        break;
+      case Story.NODES.TYPES.VIDEO:
+        util.embedVideo(mediaElem, attrs[Story.NODES.MEDIA.VIDEO]);
+        break;    
+      }
+      
+      $cardCaption.text(curr[Story.NODES.CAPTION]);
+
+      $cardLinks.html('');
+      for (var edgeId in next) {
+        if (!next.hasOwnProperty(edgeId)) {
+          continue;
+        }
+
+        var button = document.createElement('paper-button');
+        var target = next[edgeId].target;
+        button.addEventListener('click', function (e) {
+          window.setTimeout(function () {
+            goTo(target);
+          }, 200);
+        });
+        Polymer.dom(button).textContent = next[edgeId].name;
+        $cardLinks.append(button);
+      }
+      
+      $cont.animate({ scrollTop: (0) }, 'slow');
+    };
+
+    
+    _init();
   }).fail(function(){
-    window.y= undefined;
     console.log('Story Viewer: Yjs initialization failed');
   });
-  
-};
-
-/**
- * Callback for IWC
- */
-narrator.iwcCallback = function (intent) {
-  console.log("NARRATOR RECEIVED", intent);
-  console.log('node hit:', intent.extras.payload.data);
-
-  switch (intent.action) {
-  case conf.intents.syncmeta:
-    var payload = intent.extras.payload.data;
-    if (payload.type == conf.operations.entitySelect) {
-      var data = JSON.parse(payload.data);
-      var id = data.selectedEntityId;
-      if (Story.NODES.TYPES.MEDIA.includes(narrator.story.getNodeType(id))) {
-        narrator.display(id, true);
-      }
-    }
-    break;
-  }
-};
-
-narrator.iwcEmit = function (type, data) {
-  if (this.iwcClient) {
-    this.iwcClient.sendIntent(type, data, false);
-  }
-};
-
-/**
- * Creates the story of the pure yjs data
- * @param {obj} story - yjs representation of the story graph
- */
-narrator.initStory = function (story) {
-  this.story = new Story(story);
-  narrator.refresh();
-};
-
-/**
- * Callback for when the story changed
- */
-narrator.storyChanged = function (events) {
-  $('#refresh_button').removeAttr('disabled');
-};
-
-/**
- * Re-initializes the story, keeping the current state if one was set
- */
-narrator.refresh = function () {
-  narrator.story.update(window.y.share.data.get('model'));
-  $('#story_title').text(narrator.story.getName() || lang.NO_NAME);
-  if (narrator.story.isEmpty()) {
-    narrator.showTutorial();
-  } else if (!narrator.story.getState()) {
-    var entry = narrator.story.getEntryNode();
-    if (entry) {
-      narrator.story.setState(entry);
-      narrator.story.setStart(entry);
-      narrator.display(narrator.story.getState());
-    } else {
-      narrator.showNoBegin();
-    }
-  } else {
-    narrator.display(narrator.story.getState());
-  }
-
-  $('#refresh_button').attr('disabled','');
-};
-
-narrator.showTutorial = function () {
-  console.log(conf.external);
-  narrator.embedImage($('#card_media'), conf.external.ROOT+'img/tut.jpg');
-  $('#card_caption').text(lang.TUTORIAL);
-};
-
-narrator.showNoBegin = function () {
-  $('#card_caption').text(lang.NO_BEGIN);
-};
-
-/**
- * Changes the story page to display
- * @param {int} id 
- */
-narrator.goTo = function (id) {
-  this.path.push(this.story.getState());
-  this.display(id);
-  $('#undo_button').removeAttr('disabled');
-};
-
-/**
- * Walks back one step in the story path
- */
-narrator.undo = function () {
-  this.display(this.path.pop());
-  if (this.path.length === 0) {
-    $('#undo_button').attr('disabled','');
-  }
-};
-
-/**
- * Displays a media file
- * @param {int} id 
- * @param {bool} hide - if true, omit story transition options, that are forbidden by requirements 
- */
-narrator.display = function (id, hide) {
-  if (!hide) {
-    narrator.iwcClient.sendSelectNode(id, narrator.story.getNodeType(id));  
-  }
-  this.story.setState(id);
-  var next = this.story.getStoryTransitions(id, narrator.maskMode);
-  var num = 0;
-  var one = "";
-  for (var edgeId in next) {
-    if (!next.hasOwnProperty(edgeId)) {
-      continue;
-    }
-    
-    num++;
-    one = edgeId;
-    if (next[edgeId].name == "") {
-      next[edgeId].name = this.story.getNodeAttributes(next[edgeId].target)[Story.NODES.TITLE];
-    }
-  }
-  if (num == 1 && next[one].name == this.story.getNodeAttributes(next[one].target)[Story.NODES.TITLE]) {
-    next[one].name = "next";
-  }
-  
-  var curr = this.story.getNodeAttributes(id);
-
-  $('#card_title').text(curr[Story.NODES.TITLE]);
-
-  $('#card_media').html('');
-  var mediaElem = $('#card_media');
-  switch (this.story.getNodeType(id)) {
-  case Story.NODES.TYPES.TEXT:
-    util.embedText(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.TEXT]);
-    break;
-  case Story.NODES.TYPES.IMAGE:
-    util.embedImage(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.IMAGE]);
-    break;
-  case Story.NODES.TYPES.VIDEO:
-    util.embedVideo(mediaElem, this.story.getNodeAttributes(id)[Story.NODES.MEDIA.VIDEO]);
-    break;    
-  }
-  
-  $('#card_caption').text(curr[Story.NODES.CAPTION]);
-
-  $('#card_links').html('');
-  for (var edgeId in next) {
-    if (!next.hasOwnProperty(edgeId)) {
-      continue;
-    }
-
-    var button = document.createElement('paper-button');
-    var target = next[edgeId].target;
-    button.setAttribute('onclick', 'window.setTimeout(function(){narrator.goTo("'+target+'")},200);');
-    Polymer.dom(button).textContent = next[edgeId].name;
-    $('#card_links').append(button);
-  }
-  
-  $('#cont').animate({ scrollTop: (0) }, 'slow');
 };
