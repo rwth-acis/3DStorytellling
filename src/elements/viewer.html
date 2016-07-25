@@ -61,7 +61,7 @@
             <paper-icon-button icon="menu"></paper-icon-button>
 
             <span id="story_title" class="title"></span>
-            <paper-icon-button id="default_view_button" icon="arrow-upward" onclick="viewer.toLastView();">
+            <paper-icon-button id="default_view_button" icon="visibility" onclick="viewer.toLastView();">
 
             </paper-icon-button>
             <div hidden$="{{!editor}}"><paper-icon-button id="refresh_button" icon="refresh" onclick="viewer.refresh();" disabled>
@@ -87,7 +87,7 @@
                         <button id="curr_tag_button" type="button" onclick="viewer.clipboardButton()" disabled>Save!</button> 
                     </div>
                 </iron-pages>
-                <paper-toast id="toast_cp" class="toast_good" text="Press the save button (above the canvas) to apply"></paper-toast>
+                <paper-toast id="toast_cp" class="toast_good" text="Success!"></paper-toast>
                 <paper-toast id="toast_cp_fail" class="toast_bad" text="An error occurred"></paper-toast>
             </div>
             <div id="div_3d">
