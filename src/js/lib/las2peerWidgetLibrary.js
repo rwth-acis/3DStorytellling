@@ -79,50 +79,49 @@ function Las2peerWidgetLibrary(endpointUrl, iwcCallback, componentName) {
  *          failed. Expects one parameter "error" representing the error
  *          occurred.
  */
-Las2peerWidgetLibrary.prototype.sendRequest = function(method, relativePath,
-        content, mime, customHeaders, authenticate, successCallback, errorCallback) {
-  var mtype = "text/plain; charset=UTF-8"
-  if (mime !== 'undefined') {
-    mtype = mime;
-  }
+Las2peerWidgetLibrary.prototype.sendRequest =
+  function(method, relativePath, content, mime, successCallback,
+           errorCallback, customHeaders, authenticate) {
+    var mtype = mime || "text/plain; charset=UTF-8";
 
-  var rurl = this._serviceEndpoint + "/" + relativePath;
+    var rurl = this._serviceEndpoint + "/" + relativePath;
 
-  var ajaxObj = {
-    url: rurl,
-    type: method.toUpperCase(),
-    data: content,
-    contentType: mtype,
-    crossDomain: true,
-    headers: {},
-    error: function(xhr, errorType, error) {
-      console.log(error);
-      var errorText = error;
-      if (xhr.responseText != null && xhr.responseText.trim().length > 0) {
-        errorText = xhr.responseText;
+    var ajaxObj = {
+      url: rurl,
+      type: method.toUpperCase(),
+      data: content,
+      contentType: mtype,
+      crossDomain: true,
+      headers: {},
+      error: function(xhr, errorType, error) {
+        console.log(error);
+        var errorText = error;
+        if (xhr.responseText != null && xhr.responseText.trim().length > 0) {
+          errorText = xhr.responseText;
+        }
+        errorCallback(errorText);
+      },
+      success: function(data, status, xhr) {
+        var type = xhr.getResponseHeader("Content-Type");
+        successCallback(data, type);
       }
-      errorCallback(errorText);
-    },
-    success: function(data, status, xhr) {
-      var type = xhr.getResponseHeader("Content-Type");
-      successCallback(data, type);
-    },
-  };
+    };
 
-  if (customHeaders !== undefined && customHeaders !== null) {
-    $.extend(ajaxObj.headers, customHeaders);
-  }
-  if (authenticate === true) {
-    console.log("Authenticated request...");
-    var tokenHeader = { 'access_token': window.localStorage["access_token"] }
-    $.extend(ajaxObj.headers, tokenHeader);
-    var endPointHeader = { 'oidc_provider': 'https://accounts.google.com' }
-    $.extend(ajaxObj.headers, endPointHeader);
-  } else {
-    console.log("Anonymous request...");
-  }
-  $.ajax(ajaxObj);
-};
+    if (customHeaders !== undefined && customHeaders !== null) {
+      $.extend(ajaxObj.headers, customHeaders);
+    }
+    if (authenticate === true) {
+      console.log("Authenticated request...");
+      var tokenHeader = { 'access_token': window.localStorage["access_token"] }
+      $.extend(ajaxObj.headers, tokenHeader);
+      var endPointHeader = { 'oidc_provider': 'https://accounts.google.com' }
+      $.extend(ajaxObj.headers, endPointHeader);
+    } else {
+      console.log("Anonymous request...");
+    }
+    console.log(ajaxObj);
+    $.ajax(ajaxObj);
+  };
 
 Las2peerWidgetLibrary.prototype.sendIntent = function(action, data, global) {
   if (global == null) {

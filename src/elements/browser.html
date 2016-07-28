@@ -56,7 +56,7 @@
          }
          .item {
              @apply(--layout-horizontal);
-             padding: 20px;
+             padding: 10px;
              background-color: white;
              border: 1px solid #ddd;
              cursor: pointer;
@@ -94,8 +94,8 @@
         <div class="l2">
             <iron-pages selected={{mode}}>
                 <div>        
-                    <iron-ajax url="http://localhost:8082/assets/stories.json" last-response="{{data}}" auto></iron-ajax>
-                    <iron-list id="list" items="[[data]]" as="item" selection-enabled multi-selection>
+                    <iron-ajax url="http://localhost:8082/assets/stories.json" last-response="{{storydata}}" auto></iron-ajax>
+                    <iron-list id="list" items="[[storydata]]" as="item" selection-enabled>
                         <template>
                             <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
                                 <div class="pad">
@@ -109,9 +109,26 @@
                             </div>
                         </template>
                     </iron-list>
-                    <paper-fab id="plus_button" mini icon="add"></paper-fab>
+                    <paper-fab id="plus_button_stories" mini icon="add"></paper-fab>
                 </div>
                 <div>
+                    <iron-ajax id="models_ajax" url="http://192.168.0.26:8080/3DST/models" last-response="{{modeldata}}" auto></iron-ajax>
+                    <iron-list id="list" items="[[modeldata]]" as="item" selection-enabled>
+                        <template>
+                            <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
+                                <div class="pad">
+                                    <div class="primary">[[item.name]]</div>
+                                    <div class="longText">[[item.description]]<br>
+                                        <button id="button_load_model" type="button" on-click="loadModel" ref="[[item.url]]">Load</button>
+                                        <button id="button_edit_model" type="button" on-click="editModel" ref="[[item.url]]">Edit</button>
+                                        <button id="button_stories" type="button" on-click="editModel" ref="[[item.url]]" title="Stories containing this model">Stories</button>
+                                        <button id="button_delete_model" type="button" on-click="deleteModel" ref="[[item.id]]" title="Remove this model from the browser">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </iron-list>
+                    <paper-fab id="plus_button_models" mini icon="add"></paper-fab>
                 </div>
             </iron-pages>
         </div>
@@ -126,12 +143,34 @@
         <paper-dialog id="link_dialog" entry-animation="scale-up-animation" exit-animation="scale-down-animation" style="width: 200px">
             <div>You will now be redirected</div>
             <div class="buttons">
-            <a id="space_redirector" href="" tabindex="-1" target="_blank">
-                <paper-button raised>Okay</paper-button>
-            </a>
-            <paper-button dialog-dismiss>Cancel</paper-button>
+                <a id="space_redirector" href="" tabindex="-1" target="_blank">
+                    <paper-button raised>Okay</paper-button>
+                </a>
+                <paper-button dialog-dismiss>Cancel</paper-button>
             </div>
         </paper-dialog>
+
+        <paper-dialog id="sure_dialog" entry-animation="scale-up-animation" exit-animation="scale-down-animation" style="width: 200px">
+            <div>Are you sure?</div>
+            <div class="buttons">
+                <paper-button id="sure_button" raised>Yes</paper-button>
+                <paper-button dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+        
+        <paper-dialog id="add_model" entry-animation="scale-up-animation" exit-animation="scale-down-animation" style="padding:5px; margin:5px">
+            <form id="model_form" action="">
+                Name: <input type="text" name="modelName"><br>
+                URL: <input type="text" name="modelURL"><br>
+                Description: <textarea name="modelDescription"></textarea>
+                <input type="submit" value="Preview">
+            </form> 
+            <div class="buttons">
+                <paper-button id="model_submit" raised>Submit</paper-button>
+                <paper-button dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+
     </template>
 </dom-module>
 
@@ -175,6 +214,18 @@
 
      editStory: function(e) {
          this.fire('editStory', {id: e.target.ref});
+     },
+
+     loadModel: function(e) {
+         this.fire('loadModel', {url: e.target.ref});
+     },
+
+     editModel: function(e) {
+         this.fire('editModel', {url: e.target.ref});
+     },
+
+     deleteModel: function(e) {
+         this.fire('deleteModel', {id: e.target.ref});
      }
 
  });

@@ -80,8 +80,9 @@ function Las2peerWidgetLibrary(endpointUrl, iwcCallback, componentName) {
  *          failed. Expects one parameter "error" representing the error
  *          occurred.
  */
-Las2peerWidgetLibrary.prototype.sendRequest = function(method, relativePath,
-        content, mime, customHeaders, authenticate, successCallback, errorCallback) {
+Las2peerWidgetLibrary.prototype.sendRequest =
+  function(method, relativePath,  content, mime, successCallback, errorCallback,
+           customHeaders, authenticate) {
   var mtype = "text/plain; charset=UTF-8"
   if (mime !== 'undefined') {
     mtype = mime;

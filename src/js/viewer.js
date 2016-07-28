@@ -34,6 +34,8 @@ viewer.buffer = "";
 viewer.editorMode;
 viewer.maskMode;
 
+viewer.model = "";
+
 /**
  * Initializes the viewer's logic
  * @param {bool} editorMode
@@ -54,15 +56,15 @@ viewer.init = function (editorMode, model) {
     me.elem[0].addEventListener("mousemove", me.handleOrientation, true);
   });
 
-  yjsSync(editorMode ? conf.y.ROOM_EDITOR : conf.y.ROOM_VIEWER).done(function(y){
+  yjsSync().done(function(y){
     
     function initY () {
       window.y = y;
       console.info('Object Viewer: Yjs successfully initialized');
       viewer.initStory(y.share.data.get('model'));
       y.share.data.observe(viewer.storyChanged);
-      console.log(y.share.data.get('model'));
-      me.loadModel(model);
+      viewer.model = y.share.data.get('model3d') || model;
+      me.loadModel(viewer.model);
     }
     initY();
 
@@ -81,6 +83,10 @@ viewer.iwcCallback = function (intent) {
   case conf.intents.syncmeta:
     var payload = intent.extras.payload.data;
     if (payload.type == conf.operations.entitySelect) {
+      if (!viewer.story) {
+        break;
+      }
+      
       var data = JSON.parse(payload.data);
       var id = data.selectedEntityId;
       var clearedTags = false;
@@ -103,7 +109,6 @@ viewer.iwcCallback = function (intent) {
 
       function updateTags(id) {
         var tags = viewer.story.getTags(id);
-        console.log('TAGS:', tags);
         tags.forEach(function(tag) {
           if (tag.position && conf.regex.tag.test(tag.position)) {
             viewer.cones.createFromMeta(tag);
@@ -130,7 +135,6 @@ viewer.iwcCallback = function (intent) {
           viewer.handleTagHover(cone.id);
         }
       }
-      
       if (viewer.story.isNode(id)) {
         var nodeType = viewer.story.getNodeType(id);
         var isMedia = Story.NODES.TYPES.MEDIA.includes(nodeType);
@@ -197,16 +201,20 @@ viewer.initStory = function (story) {
  * Callback when story graph changed
  */
 viewer.storyChanged = function (events) {
+  var newModel = window.y.share.data.get('model3d');
+  if (newModel != viewer.model) {
+    viewer.loadModel(newModel);
+    viewer.model = newModel;
+  }
   viewer.story.update(window.y.share.data.get('model'));
 };
 
 /**
- * Tells x3dom the new object id, leading to the URL to load it from
+ * Tells x3dom the new URL to load model from
  */
-viewer.loadModel = function (id) {
-  var model = conf.external.OBJECT_ROOT+id+'.x3d';
-  console.log('loading model from: '+model);
-  viewer.inline.attr('url', model);
+viewer.loadModel = function (path) {
+  console.log('loading model from: '+path);
+  viewer.inline.attr('url', path);
 };
 
 /**

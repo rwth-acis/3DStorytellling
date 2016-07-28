@@ -63,5 +63,13 @@ util = {
    */
   embedAudio : function (elem, url) {
     elem.html('<audio src="'+url+'" controls style="width:100%"></audio>');
+  },
+
+  serializeForm : function ($form) {
+    var values = {};
+    $.each($form.serializeArray(), function(i, field) {
+      values[field.name] = field.value;
+    });
+    return values;
   }
 };

@@ -5,7 +5,7 @@ narrator = {};
  * @param {bool} editorMode
  */
 narrator.init = function (eM) {
-  yjsSync(eM ? conf.y.ROOM_EDITOR : conf.y.ROOM_VIEWER).done(function(y) {
+  yjsSync().done(function(y) {
     
     var $undo = $('#undo_button').prop('disabled', true),
         $refresh = $('#refresh_button').prop('disabled', true),
@@ -76,7 +76,7 @@ narrator.init = function (eM) {
           var data = JSON.parse(payload.data);
           var id = data.selectedEntityId;
           if (Story.NODES.TYPES.MEDIA.includes(story.getNodeType(id))) {
-            display(id, true);
+            goTo(id, true);
           }
         }
         break;
@@ -123,10 +123,12 @@ narrator.init = function (eM) {
     /**
      * Changes the story page to display
      * @param {int} id 
+     * @param {bool} hide - no iwc should happen in case story switch was 
+     *                      already caused by one
      */
-    var goTo = function (id) {
+    var goTo = function (id, hide) {
       path.push(story.getState());
-      display(id);
+      display(id, hide);
       $undo.prop('disabled', false);
     };
 
