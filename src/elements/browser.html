@@ -103,7 +103,7 @@
                                     <div class="shortText">by [[item.author]]</div>
                                     <div class="longText">[[item.description]]<br>
                                         <button id="button_load" type="button" on-click="loadStory" ref="[[item.id]]">View</button>
-                                        <button id="button_edit" type="button" on-click="editStory" ref="[[item.id]]">Edit</button>
+                                        <button id="button_edit" type="button" on-click="editStory" ref="[[item]]">Edit</button>
                                     </div>
                                 </div>
                             </div>
@@ -120,8 +120,7 @@
                                     <div class="primary">[[item.name]]</div>
                                     <div class="longText">[[item.description]]<br>
                                         <button id="button_load_model" type="button" on-click="loadModel" ref="[[item.url]]">Load</button>
-                                        <button id="button_edit_model" type="button" on-click="editModel" ref="[[item.url]]">Edit</button>
-                                        <button id="button_stories" type="button" on-click="editModel" ref="[[item.url]]" title="Stories containing this model">Stories</button>
+                                        <button id="button_edit_model" type="button" on-click="editModel" ref="[[item]]">Edit</button>
                                         <button id="button_delete_model" type="button" on-click="deleteModel" ref="[[item.id]]" title="Remove this model from the browser">Delete</button>
                                     </div>
                                 </div>
@@ -170,6 +169,19 @@
                 <paper-button dialog-dismiss>Cancel</paper-button>
             </div>
         </paper-dialog>
+        
+        <paper-dialog id="edit_story" entry-animation="scale-up-animation" exit-animation="scale-down-animation" style="padding:5px; margin:5px">
+            <form id="story_form" action="">
+                Title: <input type="text" name="storyName"><br>
+                Description: <textarea name="storyDescription"></textarea>
+                <input type="submit" value="Load">
+            </form> 
+            <div class="buttons">
+                <paper-button id="story_submit" raised>Save</paper-button>
+                <paper-button dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+
 
     </template>
 </dom-module>
@@ -213,7 +225,7 @@
      },
 
      editStory: function(e) {
-         this.fire('editStory', {id: e.target.ref});
+         this.fire('editStory', {data: e.target.ref});
      },
 
      loadModel: function(e) {
@@ -221,7 +233,7 @@
      },
 
      editModel: function(e) {
-         this.fire('editModel', {url: e.target.ref});
+         this.fire('editModel', {data: e.target.ref});
      },
 
      deleteModel: function(e) {
