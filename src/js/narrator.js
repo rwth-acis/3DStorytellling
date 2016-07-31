@@ -24,18 +24,19 @@ narrator.init = function (eM) {
         maskMode = !eM,
 
         _init = function () {
-          y.share.data.observe(storyChanged);
-          window.y = y;
-
+          // IWC
           iwcClient =  new Las2peerWidgetLibrary(conf.external.LAS,
                                                  iwcCallback,
                                                  "ATTRIBUTE");
-
-          $undo.on('click', undo);
-          $refresh.on('click', refresh);
-
+          // Yjs
+          y.share.data.observe(storyChanged);
+          window.y = y;
           initStory(y.share.data.get('model'));
           console.info('Story Viewer: Yjs successfully initialized');
+
+          // Buttons
+          $undo.on('click', undo);
+          $refresh.on('click', refresh);
         };
 
     /**

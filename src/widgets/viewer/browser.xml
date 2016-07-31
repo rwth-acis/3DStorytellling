@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+  <ModulePrefs title="Browser" description="" author="Jan Benscheid" author_email="benscheid@dbis.rwth-aachen.de" width="300" height="400">
+
+    <Require feature="opensocial-0.8" ></Require>
+    <Require feature="openapp" ></Require>
+    <Require feature="dynamic-height"></Require>
+    
+    <OAuth>
+      <Service name="openapp"
+               xmlns:openapp="http://www.role-project.eu/xml/openapp/opensocialext/"
+               openapp:service="http://purl.org/role/terms/spaceService"
+               openapp:permitReadAppend="http://purl.org/role/terms/data">
+        <Request method="" url=""></Request>
+        <Authorization url=""></Authorization>
+        <Access method="" url=""></Access>
+      </Service>
+    </OAuth>
+    
+  </ModulePrefs>
+  <Content type="xml">
+    <![CDATA[
+             <head>
+             <meta charset="utf-8">
+             <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+             <title>Story Browser</title>
+
+             <script src="http://localhost:8082/src/js/lib/webcomponentsjs/webcomponents-lite.js"></script>
+             
+             <link rel="import" href="http://localhost:8082/src/elements/browser.html">
+             </head>
+             <body>
+             
+             <story-browser></story-browser>
+             
+             </body>
+    ]]>
+  </Content>
+</Module>

@@ -3,7 +3,7 @@ browser = {};
 browser.init = function (eM) {
   yjsSync().done(function(y) {
     var $addStory = $('#plus_button_stories'),
-        $elem = document.querySelector('story-browser'),
+        $poly = document.querySelector('story-browser'),
         $loaded = $('#loaded_dialog'),
         $linked = $('#link_dialog'),
         $redirector = $linked.find('#space_redirector'),
@@ -37,11 +37,11 @@ browser.init = function (eM) {
           $modelSubmit.on('click', submitModel);
           $storySubmit.on('click', submitStory);
           $sureButton.on('click', sure);
-          $elem.addEventListener('deleteModel', openDeleteModelDialog);
-          $elem.addEventListener('loadStory', loadStory);
-          $elem.addEventListener('editStory', editStoryClick);
-          $elem.addEventListener('loadModel', loadModel);
-          $elem.addEventListener('editModel', editModel);
+          $poly.addEventListener('deleteModel', openDeleteModelDialog);
+          $poly.addEventListener('loadStory', loadStory);
+          $poly.addEventListener('editStory', editStoryClick);
+          $poly.addEventListener('loadModel', loadModel);
+          $poly.addEventListener('editModel', editModel);
         };
 
     var sure = function (e) {

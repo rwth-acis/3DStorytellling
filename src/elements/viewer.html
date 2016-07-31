@@ -61,10 +61,10 @@
             <paper-icon-button icon="menu"></paper-icon-button>
 
             <span id="story_title" class="title"></span>
-            <paper-icon-button id="default_view_button" icon="visibility" onclick="viewer.toLastView();">
+            <paper-icon-button id="default_view_button" icon="visibility">
 
             </paper-icon-button>
-            <div hidden$="{{!editor}}"><paper-icon-button id="refresh_button" icon="refresh" onclick="viewer.refresh();" disabled>
+            <div hidden$="{{!editor}}"><paper-icon-button id="refresh_button" icon="refresh" disabled>
             </paper-icon-button></div>
         </paper-toolbar>
 
@@ -79,12 +79,12 @@
             <div hidden$="{{!editor}}" class="l2">
                 <iron-pages selected={{mode}}>
                     <div>
-                        <input id="curr_view" onClick="viewer.toClipboard('view');" value='position="0 0 0" orientation="0 0 0 0'>
-                        <button id="curr_view_button" type="button" onclick="viewer.clipboardButton()" disabled>Save!</button> 
+                        <input id="curr_view" value='position="0 0 0" orientation="0 0 0 0'>
+                        <button id="curr_view_button" type="button" disabled>Save!</button> 
                     </div>
                     <div>
-                        <input id="curr_tag" onClick="viewer.toClipboard('tag');" value='position="0 0 0" orientation="0 0 0 0'>
-                        <button id="curr_tag_button" type="button" onclick="viewer.clipboardButton()" disabled>Save!</button> 
+                        <input id="curr_tag" value='position="0 0 0" orientation="0 0 0 0'>
+                        <button id="curr_tag_button" type="button" disabled>Save!</button> 
                     </div>
                 </iron-pages>
                 <paper-toast id="toast_cp" class="toast_good" text="Success!"></paper-toast>
@@ -99,11 +99,11 @@
                     </div>
                 </paper-dialog>
 
-                <x3d id="elem" width="99vw" height$="{{_height3d(editor)}}"> 
+                <x3d id="elem" width="99vw" height$="{{_height3d(editor)}}" onmouse> 
                     <scene id="scene"">
                         <navigationInfo type='"any"' id="navType"></navigationInfo>
                         <transform>
-	                    <inline onclick="viewer.handleClick(event);" id="inline" onload="viewer.onModelLoaded();"> </inline>
+	                    <inline id="inline" onload="$('#scene').trigger('modelLoaded');"> </inline>
                         </transform>
                     </scene> 
                 </x3d>
@@ -142,14 +142,15 @@
 
      _modeChanged: function(index) {
          if (index == 0) {
-             viewer.leaveTagMode();
+             this.fire('leaveTagMode');
          } else {
-             viewer.enterTagMode();
+             this.fire('enterTagMode');
          }
      },
 
      _height3d: function(editor) {
          return editor ? '70vh' : '88vh';
      }
+
  });
 </script>
