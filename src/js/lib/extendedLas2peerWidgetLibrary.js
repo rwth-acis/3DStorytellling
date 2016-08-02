@@ -81,7 +81,7 @@ function Las2peerWidgetLibrary(endpointUrl, iwcCallback, componentName) {
  *          occurred.
  */
 Las2peerWidgetLibrary.prototype.sendRequest =
-  function(method, relativePath,  content, mime, successCallback, errorCallback,
+  function(method, relativePath, content, mime, successCallback, errorCallback,
            customHeaders, authenticate) {
   var mtype = "text/plain; charset=UTF-8"
   if (mime !== 'undefined') {

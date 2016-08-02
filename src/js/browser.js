@@ -3,6 +3,8 @@ browser = {};
 browser.init = function (eM) {
   yjsSync().done(function(y) {
     var $addStory = $('#plus_button_stories'),
+        $confirm = $('#confirm')[0],
+        $saveStory = $('#save_button_stories'),
         $poly = document.querySelector('story-browser'),
         $loaded = $('#loaded_dialog'),
         $linked = $('#link_dialog'),
@@ -11,9 +13,13 @@ browser.init = function (eM) {
         $addModelDialog = $('#add_model'),
         $editStoryDialog = $('#edit_story'),
         $modelForm = $('#model_form'),
+        $storyForm = $('#story_form'),
         $modelSubmit = $('#model_submit'),
         $storySubmit = $('#story_submit'),
-        $modelsAjax = $('#models_ajax'),
+        $modelsAjax = $('#models_ajax').attr('url', conf.external.LAS+
+                                             '/3DST/stories.json'),
+        $storiesAjax = $('#stories_ajax').attr('url', conf.external.LAS+
+                                               '/CAE/models'),
         $sureDialog = $('#sure_dialog'),
         $sureButton = $('#sure_button'),
 
@@ -33,6 +39,7 @@ browser.init = function (eM) {
             openAddModelDialog(e, null);
           });
           $addStory.on('click', addStoryButtonClick);
+          $saveStory.on('click', saveStoryButtonClick);
           $modelForm.submit(previewModel);
           $modelSubmit.on('click', submitModel);
           $storySubmit.on('click', submitStory);
@@ -40,10 +47,11 @@ browser.init = function (eM) {
           $poly.addEventListener('deleteModel', openDeleteModelDialog);
           $poly.addEventListener('loadStory', loadStory);
           $poly.addEventListener('editStory', editStoryClick);
+          $poly.addEventListener('deleteStory', deleteStoryClick);
           $poly.addEventListener('loadModel', loadModel);
           $poly.addEventListener('editModel', editModel);
         };
-
+    
     var sure = function (e) {
       if (context == 'deleteModel') {
         deleteModel(selectedModel).then(function () {
@@ -137,76 +145,129 @@ browser.init = function (eM) {
     // Story Related
     ///////////////////////////////////////////////////////////////
 
+    var deleteStoryClick = function (e) {
+      $confirm.popup('Are you sure?', 'Yes')
+        .then(function () {
+          iwcClient.sendRequest('DELETE', 'CAE/models/'+e.detail.name,
+                                '', 'text/plain',
+                               function () {
+                                 $storiesAjax[0].generateRequest();
+                               });
+        });
+    };
+    
     var submitStory = function (e) {
       $editStoryDialog[0].close();
       onEditModelClose();
     };
 
-    var addStoryButtonClick = function (e) {
-      
-      if (editorMode) {
-        onEditModelClose = function () {
-          console.log('TODO: PERSISTENCE');
-        };
-      } else {
-        onEditModelClose = function () {
-          console.log('TODO: PERSISTENCE');
-          $redirector.attr('href', conf.external.ROLE + 'spaces/' +
-                           conf.external.editor);
-          $linked[0].open();
-        };
-      }
-      var data = e.detail.data;
-      $editStoryDialog.find('[name="storyName"]').val('');
-      $editStoryDialog.find('[name="storyDescription"]').val('');
-      $editStoryDialog[0].open();
-      
-    };
-    
-    var loadStory = function (e) {
-      appendStory(false, e.detail.id);
-    };
-    
-    var editStoryClick = function (e) {
+    var saveStoryButtonClick = function (e) {
 
+      var model = window.y.share.data.get('model');
+      var name = model.attributes.label.value.value || '';
+      
+      onEditModelClose = function () {
+        var values = util.serializeForm($storyForm);
+        console.log(values);
+        var newname = values.storyName;
+        model.attributes.label.value.value = newname;
+        // PETRU
+        iwcClient
+          .sendRequest('POST', 'CAE/models',
+                       JSON.stringify(model),
+                       'application/json',
+                       function (data, type) {
+                         console.log('model stored', data, type);
+                         $storiesAjax[0].generateRequest();
+                       },
+                       function (error) {
+                         console.log('errror', error);
+                         iwcClient
+                           .sendRequest('PUT', 'CAE/models/'+newname,
+                                        JSON.stringify(model),
+                                        'application/json',
+                                        function (data, type) {
+                                          $storiesAjax[0].generateRequest();
+                                          console.log('model stored', data, type);
+                                        });
+                       });
+      };
+      
+      var data = e.detail.data;
+      $editStoryDialog.find('[name="storyName"]').val(name);
+      $editStoryDialog[0].open();
+    };
+    
+    var addStoryButtonClick = function (e) {
+
+      var ap = appendStory;
+      
       if (editorMode) {
-        onEditModelClose = function () {
-          console.log('TODO: PERSISTENCE');
-        };
-        var data = e.detail.data;
-        $editStoryDialog.find('[name="storyName"]').val(data.name);
-        $editStoryDialog.find('[name="storyDescription"]')
-          .val(data.description);
-        $editStoryDialog[0].open();
+        $confirm.popup('Are you sure?', 'Yes')
+          .then(function () {
+            return ap(true);
+          })
+          .then(function () {
+
+          });
       } else {
-        appendStory(true, e.detail.id)
-          .then(function (sameSpace) {
-            if (sameSpace) {
-              $loaded[0].open();
-            } else {
-              $linked[0].open();
-            }
+        $confirm.popup('Are you sure?', 'Yes')
+          .then(function () {
+            return ap(true);
+          })
+          .then(function () {
+
           });
       }
     };
     
-    var appendStory = function (toEditor, id) {
-      var deferred = $.Deferred();
-      var path = conf.external.STORY_ROOT+'story_'+id+'.json'; 
-      $.getJSON(path, function (res) {
-        if (editorMode != toEditor) {
-          var space = toEditor ? conf.external.editor : conf.external.viewer;
-          crossLoad(space, res)
-            .then(function () {
-              $redirector.attr('href', conf.external.ROLE + 'spaces/' + space);
-              deferred.resolve(false);
-            });
-        } else {
-          window.y.share.data.set('model', res);
-          deferred.resolve(true);
-        }
-      });
+    var loadStory = function (e) {
+      $confirm.popup('Are you sure?', 'Yes')
+        .then(function () {
+          appendStory(false, e.detail.name);
+        });
+    };
+    
+    var editStoryClick = function (e) {
 
+      $confirm.popup('Are you sure?', 'Yes')
+        .then(function () {
+          appendStory(true, e.detail.name);
+        });
+      
+    };
+    
+    var appendStory = function (toEditor, name) {
+      var deferred = $.Deferred();
+
+      if (!name) {
+        load(toEditor, null).then(function () {
+          deferred.resolve();
+        });
+      } else {
+        load(toEditor, name).then(function () {
+          deferred.resolve();
+        });
+      }
+
+      return deferred;
+    };
+
+    var load = function (toEditor, obj) {
+      var deferred = $.Deferred();
+      var space = toEditor ? conf.external.editor : conf.external.viewer;
+      if (editorMode != toEditor) {
+        crossLoad(space, obj)
+          .then(function () {
+            $redirector.attr('href', conf.external.ROLE + 'spaces/' + space);
+            $confirm.popup('You will now be redirected to the editor', 'Ok')
+            deferred.resolve(false);
+          });
+      } else {
+        window.y.share.data.set('model', obj);
+        $confirm.popup('Please refresh the page', 'Ok')
+        deferred.resolve(true);
+      }
       return deferred;
     };
 
