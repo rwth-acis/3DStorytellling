@@ -4,8 +4,6 @@ var Story = function (story) {
   this.state = this.getEntryNode();
 
   this.start = this.state;
-
-  this.visited = [];
 }
 
 Story.EDGES = {
@@ -63,7 +61,6 @@ Story.prototype.update = function (data) {
  */
 Story.prototype.setState = function (id) {
   this.state = id;
-  this.visited.push(id);
 };
 
 /**
@@ -283,7 +280,7 @@ Story.prototype.getStoryTransitions = function (id, mask) {
     if (curr.type == Story.EDGES.TYPES.TRANSITION && curr.dir === 1) {
       if (mask) {
         var reqs = this.getRequirements(curr.target);
-        if (!util.containsAll(this.visited, reqs)) {
+        if (!util.containsAll(mask, reqs)) {
           continue;
         }
       }

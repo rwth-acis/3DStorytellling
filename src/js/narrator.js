@@ -15,8 +15,13 @@ narrator.init = function (eM) {
         $cardMedia = $('#card_media'),
         $cardLinks = $('#card_links'),
         $cont = $('#cont'),
+        $drawer = $('#drawer'),
+        $menuButton = $('#menu_button'),
+        $useReqs = $('#use_reqs').prop('checked', !eM),
+        $cleanVisits = $('#clean_visits'),
 
         path = new Array(),
+        visited = new Array(),
         story,
         storyReady = false,
         iwcClient,
@@ -37,6 +42,16 @@ narrator.init = function (eM) {
           // Buttons
           $undo.on('click', undo);
           $refresh.on('click', refresh);
+          $menuButton.on('click', function () {
+            $drawer[0].toggle();
+          });
+          $useReqs[0].addEventListener('change', function (e) {
+            maskMode = !maskMode;
+            refresh();
+          });
+          $cleanVisits.on('click', function () {
+            visited = new Array();
+          });
         };
 
     /**
@@ -108,6 +123,7 @@ narrator.init = function (eM) {
       } else if (!story.getState()) {
         var entry = story.getEntryNode();
         if (entry) {
+          visited.push(entry);
           story.setState(entry);
           story.setStart(entry);
           display(story.getState());
@@ -160,7 +176,8 @@ narrator.init = function (eM) {
         iwcClient.sendSelectNode(id, story.getNodeType(id));  
       }
       story.setState(id);
-      var next = story.getStoryTransitions(id, maskMode);
+      visited.push(id);
+      var next = story.getStoryTransitions(id, (maskMode ? visited : null));
       var num = 0;
       var one = "";
       for (var edgeId in next) {

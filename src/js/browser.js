@@ -200,25 +200,11 @@ browser.init = function (eM) {
     
     var addStoryButtonClick = function (e) {
 
-      var ap = appendStory;
+      $confirm.popup('Are you sure?', 'Yes')
+        .then(function () {
+          appendStory(true);
+        });
       
-      if (editorMode) {
-        $confirm.popup('Are you sure?', 'Yes')
-          .then(function () {
-            return ap(true);
-          })
-          .then(function () {
-
-          });
-      } else {
-        $confirm.popup('Are you sure?', 'Yes')
-          .then(function () {
-            return ap(true);
-          })
-          .then(function () {
-
-          });
-      }
     };
     
     var loadStory = function (e) {
