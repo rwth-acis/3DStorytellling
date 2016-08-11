@@ -8,7 +8,7 @@ narrator.init = function (eM) {
   yjsSync().done(function(y) {
     
     var $undo = $('#undo_button').prop('disabled', true),
-        $refresh = $('#refresh_button').prop('disabled', true),
+        //$refresh = $('#refresh_button').prop('disabled', true),
         $storyTitle = $('#story_title'),
         $cardTitle = $('#card_title'),
         $cardCaption = $('#card_caption'),
@@ -27,6 +27,7 @@ narrator.init = function (eM) {
         iwcClient,
         editorMode = eM,
         maskMode = !eM,
+        blocker = new util.Blocker(conf.general.refresh_timeout),
 
         _init = function () {
           // IWC
@@ -41,7 +42,7 @@ narrator.init = function (eM) {
 
           // Buttons
           $undo.on('click', undo);
-          $refresh.on('click', refresh);
+          //$refresh.on('click', refresh);
           $menuButton.on('click', function () {
             $drawer[0].toggle();
           });
@@ -75,7 +76,11 @@ narrator.init = function (eM) {
      * Callback for when the story changed
      */
     var storyChanged = function (events) {
-      $refresh.prop('disabled', false)
+      //$refresh.prop('disabled', false);
+      blocker.execute(function () {
+        refresh();
+        console.log('refresh narrator');
+      });
     };
     
     /**
@@ -84,18 +89,14 @@ narrator.init = function (eM) {
     var iwcCallback = function (intent) {
       console.log("NARRATOR RECEIVED", intent);
       console.log('node hit:', intent.extras.payload.data);
+      var payload = intent.extras.payload.data;
 
-      switch (intent.action) {
-      case conf.intents.syncmeta:
-        var payload = intent.extras.payload.data;
-        if (payload.type == conf.operations.entitySelect) {
-          var data = JSON.parse(payload.data);
-          var id = data.selectedEntityId;
-          if (Story.NODES.TYPES.MEDIA.includes(story.getNodeType(id))) {
-            goTo(id, true);
-          }
+      if (payload.type == conf.operations.entitySelect) {
+        var data = JSON.parse(payload.data);
+        var id = data.selectedEntityId;
+        if (Story.NODES.TYPES.MEDIA.includes(story.getNodeType(id))) {
+          goTo(id, true);
         }
-        break;
       }
     };
 
@@ -131,10 +132,10 @@ narrator.init = function (eM) {
           showNoBegin();
         }
       } else {
-        display(story.getState());
+        display(story.getState(), true);
       }
 
-      $refresh.prop('disabled', true);     
+      //$refresh.prop('disabled', true);     
     };
 
     /**
@@ -205,6 +206,7 @@ narrator.init = function (eM) {
       $cardMedia.html('');
       var mediaElem = $cardMedia;
       var attrs = story.getNodeAttributes(id);
+      
       switch (story.getNodeType(id)) {
       case Story.NODES.TYPES.TEXT:
         util.embedText(mediaElem, attrs[Story.NODES.MEDIA.TEXT]);

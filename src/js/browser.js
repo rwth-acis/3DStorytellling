@@ -17,11 +17,12 @@ browser.init = function (eM) {
         $modelSubmit = $('#model_submit'),
         $storySubmit = $('#story_submit'),
         $modelsAjax = $('#models_ajax').attr('url', conf.external.LAS+
-                                             '/3DST/stories.json'),
+                                             '/3DST/models'),
         $storiesAjax = $('#stories_ajax').attr('url', conf.external.LAS+
                                                '/CAE/models'),
         $sureDialog = $('#sure_dialog'),
         $sureButton = $('#sure_button'),
+        $toastFail = $('#toast_fail'),
 
         editorMode = eM,
         selectedModel = null,
@@ -171,7 +172,6 @@ browser.init = function (eM) {
         console.log(values);
         var newname = values.storyName;
         model.attributes.label.value.value = newname;
-        // PETRU
         iwcClient
           .sendRequest('POST', 'CAE/models',
                        JSON.stringify(model),
@@ -182,6 +182,7 @@ browser.init = function (eM) {
                        },
                        function (error) {
                          console.log('errror', error);
+                         handleSubmitError(error);
                          iwcClient
                            .sendRequest('PUT', 'CAE/models/'+newname,
                                         JSON.stringify(model),
@@ -189,6 +190,10 @@ browser.init = function (eM) {
                                         function (data, type) {
                                           $storiesAjax[0].generateRequest();
                                           console.log('model stored', data, type);
+                                        },
+                                        function (data, type) {
+                                          handleSubmitError(error);
+                                          console.log(data);
                                         });
                        });
       };
@@ -196,6 +201,29 @@ browser.init = function (eM) {
       var data = e.detail.data;
       $editStoryDialog.find('[name="storyName"]').val(name);
       $editStoryDialog[0].open();
+    };
+
+    var handleSubmitError = function (e) {
+      try {
+        e = JSON.parse(e);
+      } catch (ex) {
+        $toastFail.attr('text', "An error occured. Press [Escape] to close.");
+        $toastFail[0].open();
+        return;
+      }
+      var node = e.nodes.split(';')[0];
+      var descr = e.description;
+      var exit = '. The story will not be published until this is fixed. Press Escape to close!'
+
+      if (node != "null") {
+        node = new Story(window.y.share.data.get('model'))
+          .getNodeAttributes(node)['Title'] || "[Untitled]";
+        $toastFail.attr('text', descr+' at a node titled "'+node+'"'+exit);
+      } else {
+        $toastFail.attr('text', descr+exit);
+      }
+      
+      $toastFail[0].open(); $toastFail[0].open();
     };
     
     var addStoryButtonClick = function (e) {

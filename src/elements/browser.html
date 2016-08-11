@@ -206,6 +206,9 @@
         </paper-dialog>
 
         <confirm-dialog id="confirm"></confirm-dialog>
+        <paper-toast id="toast_fail" class="toast_bad" duration=20000 text=""
+                     fitInto="story-browser" noCancelOnOutsideClick="false"></paper-toast>
+        
     </template>
 </dom-module>
 
@@ -227,6 +230,7 @@
      },
 
      ready: function() {
+         $("toast_fail").attr("fitInto", $("story-browser")[0]);
          browser.init(this.editor);
          $("#list").scrollTarget = this.ownerDocument.documentElement;
      },

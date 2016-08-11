@@ -8,6 +8,10 @@ var conf = {
     viewer : 'storyviewer',
     LAS : 'http://192.168.0.26:8080'
   },
+  general : {
+    refresh_timeout : 1000,
+    cones_scale_timeout : 200,
+  },
   y : {
     ROOM_EDITOR : '3dst_editor',
     ROOM_VIEWER : '3dst_viewer'
@@ -20,6 +24,7 @@ var conf = {
       CONE_COLOR_SELECT : '0 0.4 1',
       CONE_COLOR_LINK : '1 0.4 0',
       CONE_SIZE : 3,
+      CONE_SCALE : 30,
       TRANSPARENCY_DEFAULT : 0.3,
       TRANSPARENCY_HIGHLIGHT : 0.1
     }

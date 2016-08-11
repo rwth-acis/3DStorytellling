@@ -41,7 +41,10 @@ viewer.init = function (eM, m) {
         editorMode = eM,
         maskMode = !eM,
         model = "",
-        cones = new Cones($scene);
+        cones = new Cones($scene),
+        blocker = new util.Blocker(conf.general.refresh_timeout),
+        coneSizeUpdateBlocker = new util.Blocker(conf.general.cones_scale_timeout),
+        selection = null,
 
         _init = function () {
           // IWC
@@ -51,6 +54,7 @@ viewer.init = function (eM, m) {
           // Yjs
           y.share.data.observe(storyChanged);
           window.y = y;
+          ySyncMetaInstance = y;
           console.info('Object Viewer: Yjs successfully initialized');
           
           initStory(y.share.data.get('model'));
@@ -59,7 +63,7 @@ viewer.init = function (eM, m) {
           
           // Buttons
           $elem[0].addEventListener('mousemove', handleOrientation, true);
-//        $refreshButton.on('click', refresh);
+          //        $refreshButton.on('click', refresh);
           $currView.on('click', function () {
             viewer.toClipboard('view');
           });
@@ -92,112 +96,123 @@ viewer.init = function (eM, m) {
             break;
           }
           
-          var data = JSON.parse(payload.data);
-          var id = data.selectedEntityId;
-          var clearedTags = false;
-
-          function clearTags() {
-            if (!clearedTags) {
-              cones.clear();
-              clearedTags = true;
-            }
-          }
-
-          function updateView(id) {
-            var view = story.getView(id);
-            if (view && conf.regex.view.test(view)) {
-              changeView(view);
-            } else {
-              changeView('default');
-            }
-          }
-
-          function updateTags(id) {
-            var tags = story.getTags(id);
-            tags.forEach(function(tag) {
-              if (tag.position && conf.regex.tag.test(tag.position)) {
-                cones.createFromMeta(tag);
-              }
-            });
-          }
-
-          function updateTransitionTags(id) {
-            var next = story.getStoryTransitions(id, maskMode);
-            for (var edgeId in next) {
-              console.log('next', next[edgeId]);
-              if (next[edgeId].tag && conf.regex.tag.test(next[edgeId].tag)) {
-                cones.createFromMeta({
-                  position : next[edgeId].tag,
-                  nodeId : edgeId,
-                  color : conf.viewer.cones.CONE_COLOR_LINK
-                });
-              }
-            } 
-          }
-
-          function selectTag(id) {
-            unhighlightAll();
-            var cone = cones.search(id);
-            if (cone) {
-              cone.highlight();
-              
-            }
-          }
-          if (story.isNode(id)) {
-            var nodeType = story.getNodeType(id);
-            var isMedia = Story.NODES.TYPES.MEDIA.includes(nodeType);
-            if (isMedia) {
-              clearTags();
-              updateTransitionTags(id);
-              story.setState(id);
-            }
-            
-            if (isMedia || nodeType == Story.NODES.TYPES.VIEW) {
-              updateView(id);
-            }
-            
-            if (isMedia || nodeType == Story.NODES.TYPES.TAG) {
-              updateTags(id);
-            }
-
-          }
-          
-          selectTag(id);
-
-          var nodeType = story.getEntityType(id);
-
-          if (nodeType == Story.NODES.TYPES.TAG ||
-              nodeType == Story.EDGES.TYPES.TRANSITION) {
-            tagInFocus = id;
-            $currTagButton.prop('disabled',false);
-          } else {
-            $currTagButton.prop('disabled',true);
-            tagInFocus = null;
-          }
-
-          if (nodeType == Story.NODES.TYPES.VIEW) {
-            viewInFocus = id;
-            targetAttr = Story.NODES.MEDIA.SETTING;
-            $currViewButton.prop('disabled',false);
-          } else {
-            $currViewButton.prop('disabled',true);
-            viewInFocus = null;
-          }
-
-          switch (nodeType) {
-          case Story.NODES.TYPES.VIEW:
-            targetAttr = Story.NODES.MEDIA.SETTING; break;
-          case Story.NODES.TYPES.TAG:
-            targetAttr = Story.NODES.MEDIA.TAG_POSITION; break;
-          case Story.EDGES.TYPES.TRANSITION:
-            targetAttr = Story.NODES.MEDIA.TRANSITION_TAG; break;
-          }
+          var id = JSON.parse(payload.data).selectedEntityId;
+          show(id);
         }
         break;
       }
     };
 
+    var show = function (id) {
+      id = id || selection;
+      if (!id) {
+        return;
+      }
+      var clearedTags = false;
 
+      function clearTags() {
+        if (!clearedTags) {
+          cones.clear();
+          clearedTags = true;
+        }
+      }
+
+      function updateView(id) {
+        var view = story.getView(id);
+        if (view && conf.regex.view.test(view)) {
+          changeView(view);
+        } else {
+          changeView('default');
+        }
+      }
+
+      function updateTags(id) {
+        var tags = story.getTags(id);
+        tags.forEach(function(tag) {
+          if (tag.position && conf.regex.tag.test(tag.position)) {
+            cones.createFromMeta(tag);
+          }
+        });
+      }
+
+      function updateTransitionTags(id) {
+        var next = story.getStoryTransitions(id, maskMode);
+        for (var edgeId in next) {
+          console.log('next', next[edgeId]);
+          if (next[edgeId].tag && conf.regex.tag.test(next[edgeId].tag)) {
+            cones.createFromMeta({
+              position : next[edgeId].tag,
+              nodeId : edgeId,
+              color : conf.viewer.cones.CONE_COLOR_LINK
+            });
+          }
+        } 
+      }
+
+      function selectTag(id) {
+        unhighlightAll();
+        var cone = cones.search(id);
+        if (cone) {
+          cone.highlight();
+          
+        }
+      }
+      
+      if (story.isNode(id)) {
+        var nodeType = story.getNodeType(id);
+        var isMedia = Story.NODES.TYPES.MEDIA.includes(nodeType);
+        if (isMedia) {
+          clearTags();
+          updateTransitionTags(id);
+          story.setState(id);
+        }
+
+        if ((isMedia || nodeType == Story.NODES.TYPES.VIEW) &&
+            id !== selection) {
+          updateView(id);
+        }
+        
+        if (isMedia || nodeType == Story.NODES.TYPES.TAG) {
+          clearTags();
+          updateTags(id);
+        }
+        cones.adjustSizes(getCameraPosition());
+      }
+      
+      selectTag(id);
+
+      var nodeType = story.getEntityType(id);
+
+      if (nodeType == Story.NODES.TYPES.TAG ||
+          nodeType == Story.EDGES.TYPES.TRANSITION) {
+        tagInFocus = id;
+        $currTagButton.prop('disabled',false);
+      } else {
+        $currTagButton.prop('disabled',true);
+        tagInFocus = null;
+      }
+
+      if (nodeType == Story.NODES.TYPES.VIEW) {
+        viewInFocus = id;
+        targetAttr = Story.NODES.MEDIA.SETTING;
+        $currViewButton.prop('disabled',false);
+      } else {
+        $currViewButton.prop('disabled',true);
+        viewInFocus = null;
+      }
+
+      switch (nodeType) {
+      case Story.NODES.TYPES.VIEW:
+        targetAttr = Story.NODES.MEDIA.SETTING; break;
+      case Story.NODES.TYPES.TAG:
+        targetAttr = Story.NODES.MEDIA.TAG_POSITION; break;
+      case Story.EDGES.TYPES.TRANSITION:
+        targetAttr = Story.NODES.MEDIA.TRANSITION_TAG; break;
+      }
+
+      selection = id;
+    }
+    
     /**
      * Creates the story of the pure yjs data
      * @param {obj} story - yjs representation of the story graph
@@ -216,6 +231,11 @@ viewer.init = function (eM, m) {
         model = newModel;
       }
       story.update(window.y.share.data.get('model'));
+      
+      blocker.execute(function () {
+        show();
+        console.log('refresh viewer');
+      });
     };
 
     /**
@@ -361,10 +381,17 @@ viewer.init = function (eM, m) {
       buffer = text;
       //  $currTagBox[0].select();
       cones.deleteConesByUser(viewer.TAGS.TEMP);
-      cones.generateCone(viewer.TAGS.TEMP, pos_text, dir_text,
-                         conf.viewer.cones.CONE_COLOR_SELECT);
+      var cone = cones.generateCone(viewer.TAGS.TEMP, pos_text, dir_text,
+                                    conf.viewer.cones.CONE_COLOR_SELECT);
+      cone.scale(getCameraPosition());
     };
 
+    var getCameraPosition = function () {
+      var mat_view = $elem[0].runtime.viewMatrix().inverse();
+      var cam = mat_view.e3();
+      return cam;
+    };
+    
     /**
      * Callback for when a tag is clicked
      * @param {Object} e - jQuery event
@@ -445,6 +472,10 @@ viewer.init = function (eM, m) {
       if (str !== lastView) {
         lastView = str;
         $currView.attr('value', str);
+        var d = getCameraPosition;
+        coneSizeUpdateBlocker.execute(function () {
+          cones.adjustSizes(d());
+        });
       }
       $follower.css({left:e.clientX, top:e.clientY});
     };
@@ -576,7 +607,17 @@ Cones.prototype.clear = function () {
   }
 };
 
-
+Cones.prototype.adjustSizes = function (cam) {
+  for (var id in this.cones) {
+    if (!this.cones.hasOwnProperty(id)) {
+      continue;
+    }
+    
+    this.cones[id].scale(cam);
+//    console.log(distance);
+//    this.cones[id].
+  }
+};
 
 
 /**
@@ -601,7 +642,6 @@ var Cone = function (author, pos, dir, color, size) {
   var id = util.hashString(pos+""+dir+""+size+""+color);
   var tag = 'cone_' + id;
 
-
   var $elem = $('<transform></transform>').attr({
     id : tag,
     translation : pos,
@@ -621,6 +661,7 @@ var Cone = function (author, pos, dir, color, size) {
   this.$elem = $elem;
   this.author = author;
   this.size = size;
+  this.position = x3dom.fields.SFVec3f.parse(pos);
 };
 
 /**
@@ -632,7 +673,7 @@ Cone.prototype.getId = function () {
 
 /**
  * Appends the cones' html to the scene
-  * @param {element} scene - jQuery element of the scene
+ * @param {element} scene - jQuery element of the scene
  */
 Cone.prototype.appendToScene = function (scene) {
   scene.append(this.$elem);
@@ -658,6 +699,14 @@ Cone.prototype.removeFromScene = function () {
   this.$elem.remove();
 };
 
+/**
+ * Removes cone from the scene to which it was added to
+ */
+Cone.prototype.scale = function (cam) {
+  var scl = this.position.subtract(cam).length()/conf.viewer.cones.CONE_SCALE;
+  this.$elem.attr('scale', scl+' '+scl*2+' '+scl);
+};
+
 Cone.prototype.highlight = function () {
   this.$elem.find('#color').attr(
     'transparency', conf.viewer.cones.TRANSPARENCY_HIGHLIGHT
@@ -669,3 +718,5 @@ Cone.prototype.unhighlight = function () {
     'transparency', conf.viewer.cones.TRANSPARENCY_DEFAULT
   );
 };
+
+

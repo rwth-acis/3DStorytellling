@@ -201,6 +201,17 @@ Story.prototype.getAdjacentEdges = function (id) {
   return res;
 };
 
+Story.prototype.getNeighborhood = function (id) {
+  var edges = this.getAdjacentEdges(id);
+  var res = [];
+  for (var edge in edges) {
+    if (edges.hasOwnProperty(edge)) {
+      res.push(edge.target);
+    }
+  }
+  return res;
+};
+
 /**
  * @param {int} id 
  * @return {string|null} null, if the node does not have one

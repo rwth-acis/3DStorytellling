@@ -73,3 +73,26 @@ util = {
     return values;
   }
 };
+
+util.Blocker = function (time) {
+  this.time = time;
+  this.blocked = false;
+  this.operation = function () {};
+};
+
+util.Blocker.prototype.execute = function (op) {
+  this.operation = op;
+
+  if (!this.blocked) {
+    var me = this;
+    this.operation();
+    this.blocked = true;
+    this.operation = null;
+    setTimeout(function () {
+      if (me.operation) {
+        me.operation();
+      }
+      me.blocked = false;
+    }, this.time);
+  }
+};
