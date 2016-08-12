@@ -62,8 +62,9 @@ viewer.init = function (eM, m) {
           loadModel(model);
           
           // Buttons
-          $elem[0].addEventListener('mousemove', handleOrientation, true);
+          $elem[0].addEventListener('mousemove', handleMouseMove, true);
           //        $refreshButton.on('click', refresh);
+          setInterval(handleOrientation, 30);
           $currView.on('click', function () {
             viewer.toClipboard('view');
           });
@@ -466,17 +467,17 @@ viewer.init = function (eM, m) {
     /**
      * Callback for when the camera is moved
      */
-    var handleOrientation = function (e) {
+    var handleOrientation = function () {
       var str = calcCam();
       // avoid redundant textbox updates. still fails sometimes though
       if (str !== lastView) {
         lastView = str;
         $currView.attr('value', str);
-        var d = getCameraPosition;
-        coneSizeUpdateBlocker.execute(function () {
-          cones.adjustSizes(d());
-        });
+        cones.adjustSizes(getCameraPosition());
       }
+    };
+    
+    var handleMouseMove = function (e) {
       $follower.css({left:e.clientX, top:e.clientY});
     };
 

@@ -95,7 +95,7 @@ narrator.init = function (eM) {
         var data = JSON.parse(payload.data);
         var id = data.selectedEntityId;
         if (Story.NODES.TYPES.MEDIA.includes(story.getNodeType(id))) {
-          goTo(id, true);
+          display(id);
         }
       }
     };
@@ -104,10 +104,12 @@ narrator.init = function (eM) {
     /**
      * BUTTON FUNCTIONS
      */
-
     var undo = function (e) {
       var prev = path.pop();
-      prev && display(prev);
+      if (prev) {
+        switchTo(prev, false);
+//        iwcClient.sendSelectNode(prev, story.getNodeType(prev));
+      }// && display(prev);
       if (path.length === 0) {
         $undo.prop('disabled', true);
       }
@@ -127,11 +129,16 @@ narrator.init = function (eM) {
           visited.push(entry);
           story.setState(entry);
           story.setStart(entry);
+//          switchTo(entry, false);
+//          iwcClient.sendSelectNode(entry, story.getNodeType(entry));
           display(story.getState());
         } else {
           showNoBegin();
         }
       } else {
+        var state = story.getState();
+//        switchTo(entry, false);
+//        iwcClient.sendSelectNode(state, story.getNodeType(state));
         display(story.getState(), true);
       }
 
@@ -139,17 +146,21 @@ narrator.init = function (eM) {
     };
 
     /**
-     * Changes the story page to display
-     * @param {int} id 
-     * @param {bool} hide - no iwc should happen in case story switch was 
-     *                      already caused by one
+     * Send iwc call to switch story node.
+     * puts current node on the stack
      */
-    var goTo = function (id, hide) {
-      path.push(story.getState());
-      display(id, hide);
-      $undo.prop('disabled', false);
+    var switchTo = function (id, toStack) {
+      if (toStack) {
+        path.push(story.getState());
+        $undo.prop('disabled', false);
+      }
+      
+      if (story.isNode(id)) {
+        iwcClient.sendSelectNode(id, story.getNodeType(id));
+      } else {
+        display(id);
+      }
     };
-
     
     /**
      * MISC
@@ -169,13 +180,8 @@ narrator.init = function (eM) {
     /**
      * Displays a media file
      * @param {int} id 
-     * @param {bool} hide - no iwc should happen in case story switch was 
-     *                      already caused by one
      */
-    var display = function (id, hide) {
-      if (!hide) {
-        iwcClient.sendSelectNode(id, story.getNodeType(id));  
-      }
+    var display = function (id) {
       story.setState(id);
       visited.push(id);
       var next = story.getStoryTransitions(id, (maskMode ? visited : null));
@@ -231,7 +237,7 @@ narrator.init = function (eM) {
         var target = next[edgeId].target;
         button.addEventListener('click', function (e) {
           window.setTimeout(function () {
-            goTo(target);
+            switchTo(target, true);
           }, 200);
         });
         Polymer.dom(button).textContent = next[edgeId].name;
