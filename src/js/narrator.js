@@ -8,6 +8,7 @@ narrator.init = function (eM) {
   yjsSync().done(function(y) {
     
     var $undo = $('#undo_button').prop('disabled', true),
+        $undo2= $('#undo_button2').prop('disabled', true),
         //$refresh = $('#refresh_button').prop('disabled', true),
         $storyTitle = $('#story_title'),
         $cardTitle = $('#card_title'),
@@ -21,6 +22,7 @@ narrator.init = function (eM) {
         $cleanVisits = $('#clean_visits'),
 
         path = new Array(),
+        forkPath = new Array(),
         visited = new Array(),
         story,
         storyReady = false,
@@ -42,6 +44,7 @@ narrator.init = function (eM) {
 
           // Buttons
           $undo.on('click', undo);
+          $undo2.on('click', undo2);
           //$refresh.on('click', refresh);
           $menuButton.on('click', function () {
             $drawer[0].toggle();
@@ -108,10 +111,29 @@ narrator.init = function (eM) {
       var prev = path.pop();
       if (prev) {
         switchTo(prev, false);
-//        iwcClient.sendSelectNode(prev, story.getNodeType(prev));
-      }// && display(prev);
+        if (prev == forkPath[forkPath.length-1]) {
+          forkPath.pop();
+          if (forkPath.length === 0) {
+            $undo2.prop('disabled', true);
+          }
+        }
+      }
       if (path.length === 0) {
         $undo.prop('disabled', true);
+      }
+    };
+    
+    var undo2 = function (e) {
+      var prev = forkPath.pop();
+      if (prev) {
+        switchTo(prev, false);
+        while (path.pop() != prev) {}
+        if (path.length === 0) {
+          $undo.prop('disabled', true);
+        }
+      }
+      if (forkPath.length === 0) {
+        $undo2.prop('disabled', true);
       }
     };
 
@@ -151,8 +173,13 @@ narrator.init = function (eM) {
      */
     var switchTo = function (id, toStack) {
       if (toStack) {
-        path.push(story.getState());
+        var curr = story.getState();
+        path.push(curr);
         $undo.prop('disabled', false);
+        if (Object.keys(story.getStoryTransitions(curr, true)).length > 1) {
+          forkPath.push(curr);
+          $undo2.prop('disabled', false);
+        }
       }
       
       if (story.isNode(id)) {
@@ -235,9 +262,10 @@ narrator.init = function (eM) {
 
         var button = document.createElement('paper-button');
         var target = next[edgeId].target;
+        button.setAttribute('__target', target);
         button.addEventListener('click', function (e) {
           window.setTimeout(function () {
-            switchTo(target, true);
+            switchTo(e.target.getAttribute('__target'), true);
           }, 200);
         });
         Polymer.dom(button).textContent = next[edgeId].name;

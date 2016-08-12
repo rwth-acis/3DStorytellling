@@ -12,6 +12,7 @@
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-toast/paper-toast.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/google-youtube/google-youtube.html">
 
 <script src="http://localhost:8082/src/js/lib/vendor/jquery/dist/jquery.min.js"></script>
@@ -74,7 +75,9 @@
 
                 <span id="story_title" class="title">Loading...</span>
                 <paper-icon-button id="undo_button" icon="reply"></paper-icon-button>
-                <paper-icon-button id="undo_button" icon="reply-all"></paper-icon-button>
+                <paper-icon-button id="undo_button2" icon="reply-all"></paper-icon-button>
+                <paper-tooltip for="undo_button">Back to previous page</paper-tooltip>
+                <paper-tooltip for="undo_button2">Back to previous decision</paper-tooltip>
                <!--<div hidden$="{{!editor}}"><paper-icon-button id="refresh_button" icon="refresh"></paper-icon-button></div>-->
             </paper-toolbar>
             <div style="width:100%;" class="horizontal centered">
