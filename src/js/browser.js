@@ -9,48 +9,37 @@ browser.init = function (eM) {
         $loaded = $('#loaded_dialog'),
         $linked = $('#link_dialog'),
         $redirector = $linked.find('#space_redirector'),
-        $addModel = $('#plus_button_models'),
-        $addModelDialog = $('#add_model'),
         $editStoryDialog = $('#edit_story'),
-        $modelForm = $('#model_form'),
         $storyForm = $('#story_form'),
-        $modelSubmit = $('#model_submit'),
+        $drawer = $('#drawer'),
+        $menuButton = $('#menu_button'),
         $storySubmit = $('#story_submit'),
-        $modelsAjax = $('#models_ajax').attr('url', conf.external.LAS+
-                                             '/3DST/models'),
         $storiesAjax = $('#stories_ajax').attr('url', conf.external.LAS+
                                                '/CAE/models'),
         $sureDialog = $('#sure_dialog'),
         $sureButton = $('#sure_button'),
         $toastFail = $('#toast_fail'),
+        $toastWin = $('#toast_win'),
 
         editorMode = eM,
-        selectedModel = null,
         selectedStory = null,
         context = null,
-        onEditModelClose = null,
         iwcClient = new Las2peerWidgetLibrary(conf.external.LAS,
                                               function () {}, "ATTRIBUTE");
 
         _init = function () {
           window.y = y;
 
-          $addModel.on('click', function (e) {
-            context = 'addModel';
-            openAddModelDialog(e, null);
+          $menuButton.on('click', function () {
+            $drawer[0].toggle();
           });
           $addStory.on('click', addStoryButtonClick);
           $saveStory.on('click', saveStoryButtonClick);
-          $modelForm.submit(previewModel);
-          $modelSubmit.on('click', submitModel);
           $storySubmit.on('click', submitStory);
           $sureButton.on('click', sure);
-          $poly.addEventListener('deleteModel', openDeleteModelDialog);
           $poly.addEventListener('loadStory', loadStory);
           $poly.addEventListener('editStory', editStoryClick);
           $poly.addEventListener('deleteStory', deleteStoryClick);
-          $poly.addEventListener('loadModel', loadModel);
-          $poly.addEventListener('editModel', editModel);
         };
     
     var sure = function (e) {
@@ -60,86 +49,6 @@ browser.init = function (eM) {
           $modelsAjax[0].generateRequest();
         });
       }
-    };
-
-    var previewModel = function (e) {
-      var values = util.serializeForm($modelForm);
-      
-      loadModel({detail:{url:values.modelURL}});
-        
-      return false;
-    };
-
-    var submitModel = function (e) {
-
-      var values = util.serializeForm($modelForm);
-      if (context == 'addModel') {
-        iwcClient.sendRequest('post', '3DST/models', JSON.stringify(values),
-                              'application/json',
-                              function (data, type) {
-                                $addModelDialog[0].close();
-                                $modelsAjax[0].generateRequest();
-                              },
-                              function (error) {
-                                console.log(error);
-                              });        
-      } else if (context == 'editModel') {
-        iwcClient.sendRequest('put', '3DST/models/'+selectedModel, JSON.stringify(values),
-                              'application/json',
-                              function (data, type) {
-                                $addModelDialog[0].close();
-                                $modelsAjax[0].generateRequest();
-                              },
-                              function (error) {
-                                console.log(error);
-                              });
-
-      }
-
-      return false;
-    };
-
-    var deleteModel = function (id) {
-
-      var deferred = $.Deferred();
-      
-      iwcClient.sendRequest('delete', '3DST/models/'+id, "",
-                            'application/json',
-                            function (data, type) {
-                              $modelsAjax[0].generateRequest();
-                              deferred.resolve();
-                            },
-                            function (error) {
-                              console.log(error);
-                              deferred.resolve();
-                            });
-
-      return deferred.promise();
-    };
-
-    var openDeleteModelDialog = function (e) {
-      selectedModel = e.detail.id;
-      context = 'deleteModel';
-      $sureDialog[0].open();
-    };
-
-    var openAddModelDialog = function (e, d) {
-      var data = d || {name:"",url:"",description:""};
-      $addModelDialog.find('[name="modelName"]').val(data.name);
-      $addModelDialog.find('[name="modelURL"]').val(data.url);
-      $addModelDialog.find('[name="modelDescription"]').val(data.description);
-      
-      $addModelDialog[0].open();
-    };
-
-    var loadModel = function (e) {
-      window.y.share.data.set('model3d', e.detail.url);
-    };
-    
-    var editModel = function (e) {
-      context = 'editModel';
-      selectedModel = e.detail.data.id;
-      openAddModelDialog(e, e.detail.data);
     };
 
     ///////////////////////////////////////////////////////////////
@@ -180,20 +89,24 @@ browser.init = function (eM) {
                          console.log('model stored', data, type);
                          $storiesAjax[0].generateRequest();
                        },
-                       function (error) {
-                         console.log('errror', error);
-                         handleSubmitError(error);
+                       function (error, xhr) {
+                         console.log('errror', error, xhr);
+                         if (xhr.status == 400) {
+                           handleSubmitError(error, xhr);
+                           return;
+                         }
                          iwcClient
                            .sendRequest('PUT', 'CAE/models/'+newname,
                                         JSON.stringify(model),
                                         'application/json',
                                         function (data, type) {
                                           $storiesAjax[0].generateRequest();
+                                          $toastWin[0].open();
                                           console.log('model stored', data, type);
                                         },
-                                        function (data, type) {
+                                        function (error, xhr) {
                                           handleSubmitError(error);
-                                          console.log(data);
+                                          console.log(error);
                                         });
                        });
       };
@@ -203,19 +116,19 @@ browser.init = function (eM) {
       $editStoryDialog[0].open();
     };
 
-    var handleSubmitError = function (e) {
+    var handleSubmitError = function (e, xhr) {
       try {
         e = JSON.parse(e);
       } catch (ex) {
-        $toastFail.attr('text', "An error occured. Press [Escape] to close.");
+        $toastFail.attr('text', e+" Press [Escape] to close.");
         $toastFail[0].open();
         return;
       }
-      var node = e.nodes.split(';')[0];
+      var node = e.node;
       var descr = e.description;
       var exit = '. The story will not be published until this is fixed. Press Escape to close!'
 
-      if (node != "null") {
+      if (node != null) {
         node = new Story(window.y.share.data.get('model'))
           .getNodeAttributes(node)['Title'] || "[Untitled]";
         $toastFail.attr('text', descr+' at a node titled "'+node+'"'+exit);
@@ -223,7 +136,7 @@ browser.init = function (eM) {
         $toastFail.attr('text', descr+exit);
       }
       
-      $toastFail[0].open(); $toastFail[0].open();
+      $toastFail[0].open();
     };
     
     var addStoryButtonClick = function (e) {

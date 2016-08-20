@@ -7,6 +7,7 @@
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/iron-ajax/iron-ajax.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/app-layout/app-layout.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-tabs/paper-tabs.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-fab/paper-fab.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-input/paper-input.html">
@@ -44,13 +45,20 @@
     <template>
 
         <style include="shared-styles"></style>
-        <style>
+        <style>            .card-header {
+                @apply(--paper-font-headline);
+            }
+         
+         #cont {
+             background-color:var(--background-color);
+         }
+
          #elem {
              border: none;
          }
          
          iron-list {
-             height: 90%;
+             height: 100%;
              --iron-list-items-container: {
                  max-width: 800px;
                  margin: auto;
@@ -94,14 +102,19 @@
              margin-right: 50px;
          }
         </style>
-        
-        <paper-tabs class="l1 flex" id="tabs" selected={{mode}}>
+        <div id="cont">
+        <paper-toolbar class="toolbar">
+            <paper-icon-button id="menu_button" icon="menu"></paper-icon-button>
+        </paper-toolbar>
+        </div>
+
+<!--        <paper-tabs class="l1 flex" id="tabs" selected={{mode}}>
             <paper-tab>STORIES</paper-tab>
             <paper-tab>MODELS</paper-tab>
-        </paper-tabs>
+        </paper-tabs>-->
         <div class="l2">
-            <iron-pages selected={{mode}}>
-                <div>
+<!--            <iron-pages selected={{mode}}>
+                <div>-->
                     <iron-ajax id="stories_ajax" last-response="{{storydata}}" auto></iron-ajax>
                     <iron-list id="list" items="[[storydata]]" as="item" selection-enabled>
                         <template>
@@ -131,7 +144,7 @@
 
                     <paper-fab id="plus_button_stories" mini icon="add"></paper-fab>
                     <paper-fab hidden$="{{!editor}}" id="save_button_stories" mini icon="save"></paper-fab>
-                </div>
+<!--                </div>
                 <div>
                     <iron-ajax id="models_ajax" last-response="{{modeldata}}" auto></iron-ajax>
                     <iron-list id="list" items="[[modeldata]]" as="item" selection-enabled>
@@ -160,7 +173,7 @@
                     </iron-list>
                     <paper-fab id="plus_button_models" mini icon="add"></paper-fab>
                 </div>
-            </iron-pages>
+            </iron-pages>-->
         </div>
 
         <paper-dialog id="link_dialog"
@@ -204,8 +217,22 @@
                 <paper-button dialog-dismiss>Cancel</paper-button>
             </div>
         </paper-dialog>
-
+        
+        <app-drawer id="drawer">
+            <div class="drawer-content">
+                <div>
+                    <h1>Settings</h1>
+                    <paper-checkbox id="use_mod" noink>
+                        MOD
+                        <span class="subtitle">Show semantically incorrect stories
+                        </span>
+                    </paper-checkbox>
+                </div>
+            </div>
+        </app-drawer>
+        
         <confirm-dialog id="confirm"></confirm-dialog>
+        <paper-toast id="toast_win" class="toast_good" text="Saved"></paper-toast>
         <paper-toast id="toast_fail" class="toast_bad" duration=20000 text=""
                      fitInto="story-browser" noCancelOnOutsideClick="false"></paper-toast>
         
@@ -269,6 +296,10 @@
 
      deleteModel: function(e) {
          this.fire('deleteModel', {id: e.target.ref});
+     },
+     
+     toggleDrawer: function() {
+         $('#drawer')[0].toggle();
      }
 
  });

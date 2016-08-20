@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-  <ModulePrefs title="Browser" description="" author="Jan Benscheid" author_email="benscheid@dbis.rwth-aachen.de" width="300" height="400">
+  <ModulePrefs title="Story Browser" description="" author="Jan Benscheid" author_email="benscheid@dbis.rwth-aachen.de" width="300" height="400">
 
     <Require feature="opensocial-0.8" ></Require>
     <Require feature="openapp" ></Require>

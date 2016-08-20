@@ -71,6 +71,14 @@ util = {
       values[field.name] = field.value;
     });
     return values;
+  },
+
+  subscribeY : function (plugin, cb) {
+    plugin.onEntityAdd(cb);
+    plugin.onNodeAttributeChange(cb);
+    plugin.onEdgeAttributeChange(cb);
+    plugin.onNodeDelete(cb);
+    plugin.onEdgeDelete(cb);
   }
 };
 

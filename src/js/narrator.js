@@ -30,6 +30,7 @@ narrator.init = function (eM) {
         editorMode = eM,
         maskMode = !eM,
         blocker = new util.Blocker(conf.general.refresh_timeout),
+        plugin = syncMetaPlugin,
 
         _init = function () {
           // IWC
@@ -37,10 +38,12 @@ narrator.init = function (eM) {
                                                  iwcCallback,
                                                  "ATTRIBUTE");
           // Yjs
-          y.share.data.observe(storyChanged);
+          y.share.data.observe(storyUpdated);
           window.y = y;
           initStory(y.share.data.get('model'));
           console.info('Story Viewer: Yjs successfully initialized');
+          plugin.connect(y);
+          util.subscribeY(plugin, storyChanged);
 
           // Buttons
           $undo.on('click', undo);
@@ -78,13 +81,22 @@ narrator.init = function (eM) {
     /**
      * Callback for when the story changed
      */
-    var storyChanged = function (events) {
-      //$refresh.prop('disabled', false);
+    var changes = false;
+    var storyUpdated = function (events) {
+      if (!changes) {
+        return; 
+      }
+      changes = false;
       blocker.execute(function () {
         refresh();
         console.log('refresh narrator');
       });
     };
+
+    var storyChanged = function (events) {
+      changes = true;
+    };
+    
     
     /**
      * Callback for IWC
@@ -94,7 +106,7 @@ narrator.init = function (eM) {
       console.log('node hit:', intent.extras.payload.data);
       var payload = intent.extras.payload.data;
 
-      if (payload.type == conf.operations.entitySelect) {
+      if (payload && payload.type == conf.operations.entitySelect) {
         var data = JSON.parse(payload.data);
         var id = data.selectedEntityId;
         if (Story.NODES.TYPES.MEDIA.includes(story.getNodeType(id))) {
@@ -187,6 +199,7 @@ narrator.init = function (eM) {
       } else {
         display(id);
       }
+      visited.push(id);
     };
     
     /**
@@ -210,7 +223,6 @@ narrator.init = function (eM) {
      */
     var display = function (id) {
       story.setState(id);
-      visited.push(id);
       var next = story.getStoryTransitions(id, (maskMode ? visited : null));
       var num = 0;
       var one = "";

@@ -16,6 +16,8 @@
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="http://localhost:8082/src/js/lib/vendor/neon-animation/animations/scale-down-animation.html">
 
+<link rel="import" href="http://localhost:8082/src/elements/confirmDialog.html">
+
 <script src="http://localhost:8082/src/js/lib/vendor/jquery/dist/jquery.min.js"></script>
 <script src="http://localhost:8082/src/js/lib/vendor/x3dom/x3dom.js"></script>
 <script src="http://localhost:8082/src/js/lib/vendor/yjs/y.js"></script>
@@ -59,7 +61,7 @@
         <!--    <paper-tooltip for="refresh_button">Refresh</paper-tooltip> -->
 
         <paper-toolbar class="toolbar">
-            <paper-icon-button icon="menu"></paper-icon-button>
+            <paper-icon-button id="menu_button" icon="menu"></paper-icon-button>
 
             <span id="story_title" class="title"></span>
             <paper-icon-button id="default_view_button" icon="visibility">
@@ -112,6 +114,19 @@
             <div id="follower">	&rarr; mouse</div>
         </div>
 
+        <app-drawer id="drawer">
+            <div class="drawer-content">
+                <div>
+                    <h1>3D MODEL</h1>
+                    Insert the URL the of the 3D model (e.g. http://abc.de/model.x3d) and click 'apply'
+                    <form id="model_form" action="">
+                        <input type="text" name="modelURL" style="display: inline;">
+                        <input type="submit" value="Apply">
+                    </form> 
+                </div>
+            </div>
+        </app-drawer>
+        <confirm-dialog id="confirm"></confirm-dialog>
     </template>
 </dom-module>
 
@@ -151,7 +166,10 @@
 
      _height3d: function(editor) {
          return editor ? '70vh' : '88vh';
-     }
+     },
 
+     toggleDrawer: function() {
+         $('#drawer')[0].toggle();
+     }
  });
 </script>

@@ -16,6 +16,7 @@ viewer.init = function (eM, m) {
         $inline = $('#inline'),
         $scene = $('#scene'),
         $currTagBox = $('#curr_tag'),
+        $confirm = $('#confirm')[0],
         $navType = $('#navType'),
         $follower = $('#follower'),
         $tagHeader = $('#tag_header'),
@@ -25,6 +26,9 @@ viewer.init = function (eM, m) {
         $currTagButton = $('#curr_tag_button').prop('disabled',true),
         $currViewButton = $('#curr_view_button').prop('disabled',false),
         $refreshButton = $('#refresh_button'),
+        $drawer = $('#drawer'),
+        $modelForm = $('#model_form'),
+        $menuButton = $('#menu_button'),
         $currView = $('#curr_view'),
         $currViewButton = $('#curr_view_button'),
         $poly = document.querySelector('obj-viewer'),
@@ -45,6 +49,7 @@ viewer.init = function (eM, m) {
         blocker = new util.Blocker(conf.general.refresh_timeout),
         coneSizeUpdateBlocker = new util.Blocker(conf.general.cones_scale_timeout),
         selection = null,
+        plugin = syncMetaPlugin,
 
         _init = function () {
           // IWC
@@ -52,16 +57,19 @@ viewer.init = function (eM, m) {
                                                 iwcCallback,
                                                 "ATTRIBUTE");
           // Yjs
-          y.share.data.observe(storyChanged);
+          y.share.data.observe(storyUpdated);
           window.y = y;
           ySyncMetaInstance = y;
           console.info('Object Viewer: Yjs successfully initialized');
+          plugin.connect(y);
+          util.subscribeY(plugin, storyChanged);
           
           initStory(y.share.data.get('model'));
           model = y.share.data.get('model3d') || m;
           loadModel(model);
           
           // Buttons
+          $modelForm.submit(submitModel);
           $elem[0].addEventListener('mousemove', handleMouseMove, true);
           //        $refreshButton.on('click', refresh);
           setInterval(handleOrientation, 30);
@@ -70,6 +78,9 @@ viewer.init = function (eM, m) {
           });
           $currTag.on('click', function () {
             viewer.toClipboard('tag');
+          });
+          $menuButton.on('click', function () {
+            $drawer[0].toggle();
           });
           $currViewButton.on('click', clipboardButton);
           $currTagButton.on('click', clipboardButton);
@@ -96,9 +107,28 @@ viewer.init = function (eM, m) {
           if (!story) {
             break;
           }
-          
+
           var id = JSON.parse(payload.data).selectedEntityId;
-          show(id);
+          var nodeType = story.getEntityType(id);
+
+          switch (nodeType) {
+          case Story.NODES.TYPES.VIEW:
+            targetAttr = Story.NODES.MEDIA.SETTING; break;
+          case Story.NODES.TYPES.TAG:
+            targetAttr = Story.NODES.MEDIA.TAG_POSITION; break;
+          case Story.EDGES.TYPES.TRANSITION:
+            targetAttr = Story.NODES.MEDIA.TRANSITION_TAG; break;
+          }
+
+          if (nodeType == Story.NODES.TYPES.TAG ||
+              nodeType == Story.EDGES.TYPES.TRANSITION) {
+            selectTag(id);
+            $currTagButton.prop('disabled',false);
+          } else {
+            $currTagButton.prop('disabled',true);
+            tagInFocus = null;
+            show(id);
+          }
         }
         break;
       }
@@ -113,6 +143,7 @@ viewer.init = function (eM, m) {
 
       function clearTags() {
         if (!clearedTags) {
+          console.log('CLEARING');
           cones.clear();
           clearedTags = true;
         }
@@ -149,15 +180,6 @@ viewer.init = function (eM, m) {
           }
         } 
       }
-
-      function selectTag(id) {
-        unhighlightAll();
-        var cone = cones.search(id);
-        if (cone) {
-          cone.highlight();
-          
-        }
-      }
       
       if (story.isNode(id)) {
         var nodeType = story.getNodeType(id);
@@ -165,6 +187,7 @@ viewer.init = function (eM, m) {
         if (isMedia) {
           clearTags();
           updateTransitionTags(id);
+          updateTags(id);
           story.setState(id);
         }
 
@@ -172,26 +195,11 @@ viewer.init = function (eM, m) {
             id !== selection) {
           updateView(id);
         }
-        
-        if (isMedia || nodeType == Story.NODES.TYPES.TAG) {
-          clearTags();
-          updateTags(id);
-        }
+
         cones.adjustSizes(getCameraPosition());
       }
       
-      selectTag(id);
-
       var nodeType = story.getEntityType(id);
-
-      if (nodeType == Story.NODES.TYPES.TAG ||
-          nodeType == Story.EDGES.TYPES.TRANSITION) {
-        tagInFocus = id;
-        $currTagButton.prop('disabled',false);
-      } else {
-        $currTagButton.prop('disabled',true);
-        tagInFocus = null;
-      }
 
       if (nodeType == Story.NODES.TYPES.VIEW) {
         viewInFocus = id;
@@ -202,17 +210,17 @@ viewer.init = function (eM, m) {
         viewInFocus = null;
       }
 
-      switch (nodeType) {
-      case Story.NODES.TYPES.VIEW:
-        targetAttr = Story.NODES.MEDIA.SETTING; break;
-      case Story.NODES.TYPES.TAG:
-        targetAttr = Story.NODES.MEDIA.TAG_POSITION; break;
-      case Story.EDGES.TYPES.TRANSITION:
-        targetAttr = Story.NODES.MEDIA.TRANSITION_TAG; break;
-      }
-
       selection = id;
     }
+
+    var selectTag = function(id) {
+      tagInFocus = id;
+      cones.unhighlightAll();
+      var cone = cones.search(id);
+      if (cone) {
+        cone.highlight();          
+      }
+    };
     
     /**
      * Creates the story of the pure yjs data
@@ -225,25 +233,45 @@ viewer.init = function (eM, m) {
     /**
      * Callback when story graph changed
      */
-    var storyChanged = function (events) {
+    var changes = false;
+    var storyUpdated = function (events) {
+      if (!changes) {
+        return; 
+      }
+      changes = false;
       var newModel = window.y.share.data.get('model3d');
       if (newModel != model) {
         loadModel(newModel);
         model = newModel;
       }
       story.update(window.y.share.data.get('model'));
+      console.log(window.y.share.data.get('model'));
       
       blocker.execute(function () {
         show();
         console.log('refresh viewer');
       });
     };
+    
+    var storyChanged = function (events) {
+      changes = true;
+    };
 
+    var submitModel = function (e) {
+      var values = util.serializeForm($modelForm);
+      console.log(values);
+      $confirm.popup("Changing the model won't change the position of  tags or views you already set up. Continue?", 'Yes')
+        .then(function () {
+          loadModel(values['modelURL']);
+          $drawer[0].toggle();
+        });
+      return false;
+    };
+    
     /**
      * Tells x3dom the new URL to load model from
      */
     var loadModel = function (path) {
-      path = 'http://localhost:8082/assets/cube.x3d';
       console.log('loading model from: '+path);
       $inline.attr('url', path);
     };
@@ -417,11 +445,11 @@ viewer.init = function (eM, m) {
         $tagText.append(attrs[Story.NODES.MEDIA.TAG_DESCRIPTION]);
         $tagDialog[0].open();
       } else {
-        //    iwcClient.sendSelectNode(nodeId, story.getEdgeType(nodeId));
         var adj = story.getAdjacentEdges(story.getState());
         if (adj[nodeId]) {
           iwcClient.sendSelectNode(adj[nodeId].target,
                                    story.getNodeType(adj[nodeId].target));
+          
         }
       }
     };
@@ -453,14 +481,6 @@ viewer.init = function (eM, m) {
     var handleTagLeave = function (e, id) {
       var nodeId = cones.cones[id].nodeId;
       $follower.css({visibility: 'hidden'});
-    };
-
-    var unhighlightAll = function () {
-      for (var id in cones.cones) {
-        if (cones.cones.hasOwnProperty(id)) {
-          cones.cones[id].unhighlight();
-        }
-      }
     };
 
     var lastView = "";
@@ -571,6 +591,14 @@ Cones.prototype.search = function (nodeId) {
     }
   }
   return null
+};
+
+Cones.prototype.unhighlightAll = function () {
+  for (var id in this.cones) {
+    if (this.cones.hasOwnProperty(id)) {
+      this.cones[id].unhighlight();
+    }
+  }
 };
 
 /**
@@ -719,5 +747,3 @@ Cone.prototype.unhighlight = function () {
     'transparency', conf.viewer.cones.TRANSPARENCY_DEFAULT
   );
 };
-
-

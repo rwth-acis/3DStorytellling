@@ -54,7 +54,35 @@
         .toolbar {
         --paper-toolbar-background: var(--normal-color);
         }
+
+        #drawer {
+        --app-drawer-content-container: {
+        background-color: var(--normal-color);
+        }
+        }
         
+        .drawer-content {
+        height: 100%;
+        overflow: auto;
+        padding: 10px;
+        color:white;
+        }
+
+                 paper-checkbox {
+             --paper-checkbox-checked-color: var(--normal-color);
+             --paper-checkbox-checked-ink-color: white;
+             --paper-checkbox-unchecked-color: white;
+             --paper-checkbox-unchecked-ink-color: white;
+             --paper-checkbox-label-color: white;
+         }
+         
+         paper-checkbox .subtitle {
+             display: block;
+             font-size: 0.8em;
+             margin-top: 2px;
+             max-width: 150px;
+         }
+
       </style>
   </template>
 </dom-module>

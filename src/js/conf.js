@@ -6,7 +6,7 @@ var conf = {
     ROLE : 'http://127.0.0.1:8073/',
     editor : 'storyeditor',
     viewer : 'storyviewer',
-    LAS : 'http://192.168.0.26:8080'
+    LAS : 'http://localhost:1232'
   },
   general : {
     refresh_timeout : 1000,

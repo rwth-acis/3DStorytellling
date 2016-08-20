@@ -98,12 +98,11 @@ Las2peerWidgetLibrary.prototype.sendRequest =
     crossDomain: true,
     headers: {},
     error: function(xhr, errorType, error) {
-      console.log(error);
       var errorText = error;
       if (xhr.responseText != null && xhr.responseText.trim().length > 0) {
         errorText = xhr.responseText;
       }
-      errorCallback(errorText);
+      errorCallback(errorText, xhr);
     },
     success: function(data, status, xhr) {
       var type = xhr.getResponseHeader("Content-Type");
