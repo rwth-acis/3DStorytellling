@@ -1,0 +1,57 @@
+<link rel="import" href="http://localhost:8082/src/js/lib/vendor/polymer/polymer.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-button/paper-button.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-styles/typography.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/vendor/paper-dialog/paper-dialog.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/vendor/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="http://localhost:8082/src/js/lib/vendor/neon-animation/animations/scale-down-animation.html">
+
+<script src="http://localhost:8082/src/js/lib/vendor/jquery/dist/jquery.min.js"></script>
+
+<link rel="import" href="http://localhost:8082/src/css/defaults.html">
+
+<style is="custom-style" include="iron-flex"></style>
+
+<dom-module id="confirm-dialog">
+    <template>
+
+        <style include="shared-styles"></style>
+
+        <paper-dialog id="sure_dialog"
+                      entry-animation="scale-up-animation"
+                      exit-animation="scale-down-animation"
+                      style="width: 200px">
+            <div>{{message}}</div>
+            <div class="buttons">
+                <paper-button on-click="confirm" raised>{{ok}}</paper-button>
+                <paper-button dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+
+    </template>
+</dom-module>
+
+<script>
+ Polymer({
+     is: 'confirm-dialog',
+     
+     properties: {
+         message: 'Are you sure?',
+         ok: 'ok'
+     },
+
+     popup: function(msg, o) {
+         this.deferred = $.Deferred();
+         this.message = msg;
+         this.ok = o;
+         $('#sure_dialog')[0].open();
+         return this.deferred;
+     },
+
+     confirm: function(e) {
+         $('#sure_dialog')[0].close();
+         this.deferred.resolve();
+     }
+
+ });
+</script>
+
