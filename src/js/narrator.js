@@ -30,7 +30,6 @@ narrator.init = function (eM) {
         editorMode = eM,
         maskMode = !eM,
         blocker = new util.Blocker(conf.general.refresh_timeout),
-        plugin = syncMetaPlugin,
 
         _init = function () {
           // IWC
@@ -42,8 +41,8 @@ narrator.init = function (eM) {
           window.y = y;
           initStory(y.share.data.get('model'));
           console.info('Story Viewer: Yjs successfully initialized');
-          plugin.connect(y);
-          util.subscribeY(plugin, storyChanged);
+          syncmeta.init(y);
+          util.subscribeY(syncmeta, storyChanged);
 
           // Buttons
           $undo.on('click', undo);

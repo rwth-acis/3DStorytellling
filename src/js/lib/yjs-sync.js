@@ -14,7 +14,8 @@ var yjsSync = function (spaceTitle) {
     },
     connector: {
       name: 'websockets-client', // use the websockets connector
-      room: spaceTitle
+      room: spaceTitle,
+//      url: conf.external.Y
     },
     share: { // specify the shared content
       users:'Map',

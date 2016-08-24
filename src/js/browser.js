@@ -111,7 +111,6 @@ browser.init = function (eM) {
                        });
       };
       
-      var data = e.detail.data;
       $editStoryDialog.find('[name="storyName"]').val(name);
       $editStoryDialog[0].open();
     };

@@ -25,7 +25,8 @@
              <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
              <title>Story Browser</title>
 
-             <script src="http://localhost:8082/src/js/lib/webcomponentsjs/webcomponents-lite.js"></script>
+<script src="http://localhost:8082/src/js/loginscript.js"></script>
+<script src="http://localhost:8082/src/js/lib/webcomponentsjs/webcomponents-lite.js"></script>
              
              <link rel="import" href="http://localhost:8082/src/elements/browser.html">
              </head>

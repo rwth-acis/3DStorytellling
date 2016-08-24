@@ -6,7 +6,8 @@ var conf = {
     ROLE : 'http://127.0.0.1:8073/',
     editor : 'storyeditor',
     viewer : 'storyviewer',
-    LAS : 'http://localhost:1232'
+    LAS : 'http://localhost:1232',
+    Y : 'http://yjs.dbis.rwth-aachen.de:5079'
   },
   general : {
     refresh_timeout : 1000,

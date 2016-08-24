@@ -1558,7 +1558,7 @@
                         "name": "Arrow",
                         "value": "generalisation"
                     },
-                    "option": "--▷"
+                    "option": "--â·"
                 },
                 "7ba854b84e9ce94cff1f91c6[shape]": {
                     "id": "7ba854b84e9ce94cff1f91c6[shape]",
@@ -1605,6 +1605,74 @@
                         "id": "7ba854b84e9ce94cff1f91c6[overlayRotate]",
                         "name": "Autoflip Overlay",
                         "value": true
+                    }
+                }
+            }
+        },
+        "3a516c0b36d6fc512ec82a91": {
+            "label": {
+                "id": "3a516c0b36d6fc512ec82a91[label]",
+                "name": "Label",
+                "value": {
+                    "id": "3a516c0b36d6fc512ec82a91[label]",
+                    "name": "Label",
+                    "value": "Model Attributes"
+                }
+            },
+            "left": 5745,
+            "top": 3965,
+            "width": 150,
+            "height": 100,
+            "zIndex": 16039,
+            "type": "Object",
+            "attributes": {
+                "[attributes]": {
+                    "id": "[attributes]",
+                    "name": "Attributes",
+                    "type": "KeySelectionValueListAttribute",
+                    "list": {
+                        "14b2458176145bcf2cfda5f9": {
+                            "id": "14b2458176145bcf2cfda5f9",
+                            "name": "Attribute",
+                            "key": {
+                                "id": "14b2458176145bcf2cfda5f9[key]",
+                                "name": "",
+                                "value": "3D Model"
+                            },
+                            "value": {
+                                "id": "14b2458176145bcf2cfda5f9[value]",
+                                "name": "",
+                                "value": "string"
+                            }
+                        },
+                        "e3d32f43e1f8823594b1ac8b": {
+                            "id": "e3d32f43e1f8823594b1ac8b",
+                            "name": "Attribute",
+                            "key": {
+                                "id": "e3d32f43e1f8823594b1ac8b[key]",
+                                "name": "",
+                                "value": "Description"
+                            },
+                            "value": {
+                                "id": "e3d32f43e1f8823594b1ac8b[value]",
+                                "name": "",
+                                "value": "string"
+                            }
+                        },
+                        "b72bd424a18f819afb573dfb": {
+                            "id": "b72bd424a18f819afb573dfb",
+                            "name": "Attribute",
+                            "key": {
+                                "id": "b72bd424a18f819afb573dfb[key]",
+                                "name": "",
+                                "value": "MOD compliant"
+                            },
+                            "value": {
+                                "id": "b72bd424a18f819afb573dfb[value]",
+                                "name": "",
+                                "value": "boolean"
+                            }
+                        }
                     }
                 }
             }

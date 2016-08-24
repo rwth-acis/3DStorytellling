@@ -49,7 +49,6 @@ viewer.init = function (eM, m) {
         blocker = new util.Blocker(conf.general.refresh_timeout),
         coneSizeUpdateBlocker = new util.Blocker(conf.general.cones_scale_timeout),
         selection = null,
-        plugin = syncMetaPlugin,
 
         _init = function () {
           // IWC
@@ -58,12 +57,13 @@ viewer.init = function (eM, m) {
                                                 "ATTRIBUTE");
           // Yjs
           y.share.data.observe(storyUpdated);
+
           window.y = y;
           ySyncMetaInstance = y;
           console.info('Object Viewer: Yjs successfully initialized');
-          plugin.connect(y);
-          util.subscribeY(plugin, storyChanged);
-          
+          syncmeta.init(y);
+          util.subscribeY(syncmeta, storyChanged);
+
           initStory(y.share.data.get('model'));
           model = y.share.data.get('model3d') || m;
           loadModel(model);
@@ -122,6 +122,10 @@ viewer.init = function (eM, m) {
 
           if (nodeType == Story.NODES.TYPES.TAG ||
               nodeType == Story.EDGES.TYPES.TRANSITION) {
+            if (!cones.search(id)) {
+              cones.createFromMeta(story.getTags(id)[0]);
+              cones.adjustSizes(getCameraPosition());
+            }
             selectTag(id);
             $currTagButton.prop('disabled',false);
           } else {
@@ -213,6 +217,9 @@ viewer.init = function (eM, m) {
       selection = id;
     }
 
+    /**
+     * @param {string} id - nodeId
+     */
     var selectTag = function(id) {
       tagInFocus = id;
       cones.unhighlightAll();
@@ -260,7 +267,7 @@ viewer.init = function (eM, m) {
     var submitModel = function (e) {
       var values = util.serializeForm($modelForm);
       console.log(values);
-      $confirm.popup("Changing the model won't change the position of  tags or views you already set up. Continue?", 'Yes')
+      $confirm.popup("Changing the model won't change the position of tags or views you already set up. Continue?", 'Yes')
         .then(function () {
           loadModel(values['modelURL']);
           $drawer[0].toggle();
@@ -301,7 +308,7 @@ viewer.init = function (eM, m) {
         iwcClient
           .clearAttr(tagInFocus, targetAttr,
                      story.getAnyAttributes(tagInFocus)[targetAttr].length);
-        iwcClient.sendAttr(tagInFocus, targetAttr, buffer);
+        syncmeta.setAttributeValue(tagInFocus, targetAttr, buffer);
         return true;
       } else if (!tagMode && viewInFocus) {
         iwcClient.
@@ -309,7 +316,7 @@ viewer.init = function (eM, m) {
                     Story.NODES.MEDIA.SETTING,
                     story.getNodeAttributes(viewInFocus)
                     [Story.NODES.MEDIA.SETTING].length);
-        iwcClient.sendAttr(viewInFocus, Story.NODES.MEDIA.SETTING, lastView);
+        syncmeta.setAttributeValue(viewInFocus, Story.NODES.MEDIA.SETTING, lastView)
         return true;
       } else {
         return false;
@@ -616,7 +623,7 @@ Cones.prototype.deleteConesByUser = function (user) {
 
 /**
  * Removes a cone
- * @param {string} id
+ * @param {string} id - coneId
  */
 Cones.prototype.deleteCone = function (id) {
   this.cones[id].removeFromScene();
@@ -743,6 +750,7 @@ Cone.prototype.highlight = function () {
 };
 
 Cone.prototype.unhighlight = function () {
+  console.log(this.$elem, this.$elem.find('#color'));
   this.$elem.find('#color').attr(
     'transparency', conf.viewer.cones.TRANSPARENCY_DEFAULT
   );
