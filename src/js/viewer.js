@@ -245,6 +245,7 @@ viewer.init = function (eM, m) {
       if (!changes) {
         return; 
       }
+      console.log("narrator applies change");
       changes = false;
       var newModel = window.y.share.data.get('model3d');
       if (newModel != model) {
@@ -261,6 +262,7 @@ viewer.init = function (eM, m) {
     };
     
     var storyChanged = function (events) {
+      console.log("viewer noticed change", events);
       changes = true;
     };
 

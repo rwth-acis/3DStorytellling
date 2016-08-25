@@ -1,4 +1,5 @@
 browser = {};
+window.sem = {};
 
 browser.init = function (eM) {
   yjsSync().done(function(y) {
@@ -12,6 +13,7 @@ browser.init = function (eM) {
         $editStoryDialog = $('#edit_story'),
         $storyForm = $('#story_form'),
         $drawer = $('#drawer'),
+        $list = $('#story_list'),
         $menuButton = $('#menu_button'),
         $storySubmit = $('#story_submit'),
         $storiesAjax = $('#stories_ajax').attr('url', conf.external.LAS+
@@ -24,12 +26,19 @@ browser.init = function (eM) {
         editorMode = eM,
         selectedStory = null,
         context = null,
+        blocker = new util.Blocker(conf.general.refresh_timeout),
         iwcClient = new Las2peerWidgetLibrary(conf.external.LAS,
                                               function () {}, "ATTRIBUTE");
 
         _init = function () {
           window.y = y;
-
+          
+          if (editorMode) {
+            syncmeta.init(y);
+            util.subscribeY(syncmeta, storyChanged);
+            y.share.data.observe(storyUpdated);
+          }
+          
           $menuButton.on('click', function () {
             $drawer[0].toggle();
           });
@@ -54,6 +63,54 @@ browser.init = function (eM) {
     ///////////////////////////////////////////////////////////////
     // Story Related
     ///////////////////////////////////////////////////////////////
+
+
+    /**
+     * Callback for when the story changed
+     */
+    var changes = false;
+    var storyUpdated = function (events) {
+      if (!changes) {
+        return;
+      }
+      console.log("browser applies change");
+      changes = false;
+      blocker.execute(function () {
+        semcheck();
+      });
+    };
+
+    var semcheck = function () {
+      var model = window.y.share.data.get('model');
+      var name = model.attributes.label.value.value || '';
+      iwcClient.sendRequest('PUT', 'CAE/semantics',
+                            JSON.stringify(model),
+                            'application/json',
+                            function (data, type) {
+                              var entry = $list.find('#entry_'+name);
+                              if (JSON.parse(data).error == 0) {
+                                console.log('noerror');
+                                entry.find('#err_icon').prop('hidden', true);
+                                if (window.sem.hasOwnProperty(name)) {
+                                  delete window.sem[name];
+                                }
+                                $poly.expandResponse();
+                              } else {
+                                var msg = parseSemanticError(data);
+                                window.sem[name] = msg;
+                                $poly.expandResponse();
+                              }
+                            },
+                            function (error, xhr) {
+                              handleSubmitError(error);
+                              console.log(error);
+                            });
+    };
+
+    var storyChanged = function (events) {
+      console.log("browser noticed change", events);
+      changes = true;
+    };
 
     var deleteStoryClick = function (e) {
       $confirm.popup('Are you sure?', 'Yes')
@@ -136,6 +193,20 @@ browser.init = function (eM) {
       }
       
       $toastFail[0].open();
+    };
+
+    var parseSemanticError = function (e) {
+      e = JSON.parse(e);
+      var node = e.node;
+      var descr = e.description;
+
+      if (node != null) {
+        node = new Story(window.y.share.data.get('model'))
+          .getNodeAttributes(node)['Title'] || "[Untitled]";
+        return descr+' at a node titled "'+node+'"';
+      } else {
+        return descr;
+      }
     };
     
     var addStoryButtonClick = function (e) {

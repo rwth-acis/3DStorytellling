@@ -83,8 +83,9 @@ narrator.init = function (eM) {
     var changes = false;
     var storyUpdated = function (events) {
       if (!changes) {
-        return; 
+        return;
       }
+      console.log("narrator applies change");
       changes = false;
       blocker.execute(function () {
         refresh();
@@ -93,6 +94,7 @@ narrator.init = function (eM) {
     };
 
     var storyChanged = function (events) {
+      console.log("narrator noticed change", events);
       changes = true;
     };
     

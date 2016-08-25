@@ -82,7 +82,7 @@
              font-size: 14px;
          }
          .longText {
-             color: gray;
+             color: red;
              display: none;
          }
          .item:hover .shortText::after {
@@ -119,25 +119,26 @@
         <div class="l2">
 <!--            <iron-pages selected={{mode}}>
                 <div>-->
-                    <iron-ajax id="stories_ajax" last-response="{{storydata}}" auto></iron-ajax>
-                    <iron-list id="list" items="[[storydata]]" as="item" selection-enabled>
+                    <iron-ajax id="stories_ajax" last-response="{{storydata}}" on-response="expandResponse" auto></iron-ajax>
+                    <iron-list id="story_list" items="[[storydata]]" as="item" selection-enabled>
                         <template>
-                            <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
+                            <div id="entry_[[item]]" class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
                                 <div class="pad">
-                                    <div class="primary">[[item]]</div>
+                                    <div class="primary"><iron-icon hidden$="[[item.semcheck]]" id="err_icon" icon="error"></iron-icon>[[item.name]]</div>
                                     <div class="longText">
+                                        <div id="err_descr" style="font-color:red;"></div>[[item.error]]</br>
                                         <button id="button_load"
                                                 type="button"
                                                 on-click="loadStory"
-                                                ref="[[item]]">View</button>
+                                                ref="[[item.name]]">View</button>
                                         <button id="button_edit"
                                                 type="button"
                                                 on-click="editStory"
-                                                ref="[[item]]">Edit</button>
+                                                ref="[[item.name]]">Edit</button>
                                         <button id="button_delete"
                                                 type="button"
                                                 on-click="deleteStory"
-                                                ref="[[item]]">Delete</button>
+                                                ref="[[item.name]]">Delete</button>
                                     </div>
                                 </div>
                             </div>
@@ -257,7 +258,7 @@
          editor: {
              type : Boolean,
              value : false
-         }
+         },
      },
 
      ready: function() {
@@ -275,7 +276,7 @@
      },
      
      _modeChanged: function(index) {
-
+         
      },
 
      loadStory: function(e) {
@@ -304,6 +305,24 @@
      
      toggleDrawer: function() {
          $('#drawer')[0].toggle();
+     },
+
+     expandResponse: function(e) {
+         this.storydata = this.storydata.map(function (s) {
+             if (!s.hasOwnProperty('name')) {
+                 return {name:s, semcheck:false, error:'on noes'};
+             } else {
+                 return s;
+             }
+         });
+         this.storydata = this.storydata.map(function (s) {
+             console.log(window.sem[s.name]);
+             if (window.sem.hasOwnProperty(s.name)) {
+                 return {name:s.name, semcheck:false, error:window.sem[s.name]};
+             } else {
+                 return {name:s.name, semcheck:true, error:''};
+             }
+         });
      }
 
  });
