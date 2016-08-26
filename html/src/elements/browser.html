@@ -1,0 +1,330 @@
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/conf.js"></script>
+
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/polymer/polymer.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-input/iron-input.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-pages/iron-pages.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-icon/iron-icon.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-icons/iron-icons.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-list/iron-list.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-ajax/iron-ajax.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/app-layout/app-layout.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-tabs/paper-tabs.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-fab/paper-fab.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-input/paper-input.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-button/paper-button.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-styles/typography.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-toast/paper-toast.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-dialog/paper-dialog.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-tooltip/paper-tooltip.html">
+
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/neon-animation/animations/scale-down-animation.html">
+
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/elements/confirmDialog.html">
+
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/jquery/dist/jquery.min.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/yjs/y.js"></script>
+
+<script src="http://rwth-acis.github.io/syncmeta/yjs/html/js/lib/vendor/require.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/openapp.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/iwc.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/extendedLas2peerWidgetLibrary.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/yjs-sync.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/syncmeta-plugin.js"></script>
+
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/conf.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/util.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lang.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/story.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/browser.js"></script>
+
+<link rel="stylesheet" type="text/css" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/x3dom/x3dom.css"></link>
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/css/defaults.html">
+
+<style is="custom-style" include="iron-flex"></style>
+
+<dom-module id="story-browser">
+    <template>
+
+        <style include="shared-styles"></style>
+        <style>            .card-header {
+                @apply(--paper-font-headline);
+            }
+         
+         #cont {
+             background-color:var(--background-color);
+         }
+
+         #elem {
+             border: none;
+         }
+         
+         iron-list {
+             height: 100%;
+             --iron-list-items-container: {
+                 max-width: 800px;
+                 margin: auto;
+                 margin-bottom: 5px;
+                 border-bottom: 1px solid #ddd;
+             };
+         }
+         .item {
+             @apply(--layout-horizontal);
+             padding: 10px;
+             background-color: white;
+             border: 1px solid #ddd;
+             cursor: pointer;
+             margin-bottom: 10px;
+         }
+         .shortText, .longText {
+             font-size: 14px;
+         }
+         .longText {
+             color: red;
+             display: none;
+         }
+         .item:hover .shortText::after {
+             content: ' [+]';
+             color: gray;
+         }
+         .item.expanded:hover .shortText::after {
+             content: '';
+         }
+         .item.expanded .longText {
+             display: block;
+         }
+
+         paper-fab {
+             position: fixed;
+             right: 30px;
+             bottom: 16px;
+         }
+         
+         #save_button_stories {
+             margin-right: 50px;
+         }
+        </style>
+        <div id="cont">
+        <paper-toolbar class="toolbar">
+            <paper-icon-button id="menu_button" icon="menu"></paper-icon-button>
+        </paper-toolbar>
+        </div>
+
+<!--        <paper-tabs class="l1 flex" id="tabs" selected={{mode}}>
+            <paper-tab>STORIES</paper-tab>
+            <paper-tab>MODELS</paper-tab>
+        </paper-tabs>-->
+        <div class="l2">
+<!--            <iron-pages selected={{mode}}>
+                <div>-->
+                    <iron-ajax id="stories_ajax" last-response="{{storydata}}" on-response="expandResponse" auto></iron-ajax>
+                    <iron-list id="story_list" items="[[storydata]]" as="item" selection-enabled>
+                        <template>
+                            <div id="entry_[[item]]" class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
+                                <div class="pad">
+                                    <div class="primary"><iron-icon hidden$="[[item.semcheck]]" id="err_icon" icon="error"></iron-icon>[[item.name]]</div>
+                                    <div class="longText">
+                                        <div id="err_descr" style="font-color:red;"></div>[[item.error]]</br>
+                                        <button id="button_load"
+                                                type="button"
+                                                on-click="loadStory"
+                                                ref="[[item.name]]">View</button>
+                                        <button id="button_edit"
+                                                type="button"
+                                                on-click="editStory"
+                                                ref="[[item.name]]">Edit</button>
+                                        <button id="button_delete"
+                                                type="button"
+                                                on-click="deleteStory"
+                                                ref="[[item.name]]">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </iron-list>
+                    <paper-tooltip for="plus_button_stories" position="top">Open new story</paper-tooltip>
+                    <paper-tooltip for="save_button_stories" position="top">Save story</paper-tooltip>
+
+                    <paper-fab id="plus_button_stories" mini icon="add"></paper-fab>
+                    <paper-fab hidden$="{{!editor}}" id="save_button_stories" mini icon="save"></paper-fab>
+<!--                </div>
+                <div>
+                    <iron-ajax id="models_ajax" last-response="{{modeldata}}" auto></iron-ajax>
+                    <iron-list id="list" items="[[modeldata]]" as="item" selection-enabled>
+                        <template>
+                            <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
+                                <div class="pad">
+                                    <div class="primary">[[item.name]]</div>
+                                    <div class="longText">[[item.description]]<br>
+                                        <button id="button_load_model"
+                                                type="button"
+                                                on-click="loadModel"
+                                                ref="[[item.url]]">Load</button>
+                                        <button id="button_edit_model"
+                                                type="button"
+                                                on-click="editModel"
+                                                ref="[[item]]">Edit</button>
+                                        <button id="button_delete_model"
+                                                type="button"
+                                                on-click="deleteModel"
+                                                ref="[[item.id]]"
+                                                title="Remove this model from the browser">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </iron-list>
+                    <paper-fab id="plus_button_models" mini icon="add"></paper-fab>
+                </div>
+            </iron-pages>-->
+        </div>
+
+        <paper-dialog id="link_dialog"
+                      entry-animation="scale-up-animation"
+                      exit-animation="scale-down-animation"
+                      style="width: 200px">
+            <div>You will now be redirected</div>
+            <div class="buttons">
+                <a id="space_redirector" href="" tabindex="-1" target="_blank">
+                    <paper-button raised>Okay</paper-button>
+                </a>
+                <paper-button dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="add_model"
+                      entry-animation="scale-up-animation"
+                      exit-animation="scale-down-animation"
+                      style="padding:5px; margin:5px">
+            <form id="model_form" action="">
+                Name: <input type="text" name="modelName"><br>
+                URL: <input type="text" name="modelURL"><br>
+                Description: <textarea name="modelDescription"></textarea>
+                <input type="submit" value="Preview">
+            </form> 
+            <div class="buttons">
+                <paper-button id="model_submit" raised>Submit</paper-button>
+                <paper-button dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+        
+        <paper-dialog id="edit_story"
+                      entry-animation="scale-up-animation"
+                      exit-animation="scale-down-animation"
+                      style="padding:5px; margin:5px">
+            <form id="story_form" action="">
+                Title: <input type="text" name="storyName"><br>
+            </form> 
+            <div class="buttons">
+                <paper-button id="story_submit" raised>Save</paper-button>
+                <paper-button dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+        
+        <app-drawer id="drawer">
+            <div class="drawer-content">
+                <div>
+                    <h1>Settings</h1>
+                    <paper-checkbox id="use_mod" noink>
+                        MOD
+                        <span class="subtitle">Show semantically incorrect stories
+                        </span>
+                    </paper-checkbox>
+                </div>
+            </div>
+        </app-drawer>
+        
+        <confirm-dialog id="confirm"></confirm-dialog>
+        <paper-toast id="toast_win" class="toast_good" text="Saved"></paper-toast>
+        <paper-toast id="toast_fail" class="toast_bad" duration=20000 text=""
+                     fitInto="story-browser" noCancelOnOutsideClick="false"></paper-toast>
+        
+    </template>
+</dom-module>
+
+<script>
+ Polymer({
+     is: 'story-browser',
+     
+     properties: {
+         mode: {
+             type: Number,
+             value: 0,
+             observer: '_modeChanged'
+         },
+         
+         editor: {
+             type : Boolean,
+             value : false
+         },
+     },
+
+     ready: function() {
+         $("toast_fail").attr("fitInto", $("story-browser")[0]);
+         browser.init(this.editor);
+         $("#list").scrollTarget = this.ownerDocument.documentElement;
+     },
+     
+     iconForItem: function(item) {
+         return item ? (item.integer < 50 ? 'star-border' : 'star') : '';
+     },
+
+     getClassForItem: function(item, selected) {
+         return selected ? 'item expanded' : 'item';
+     },
+     
+     _modeChanged: function(index) {
+         
+     },
+
+     loadStory: function(e) {
+         this.fire('loadStory', {name: e.target.ref});
+     },
+
+     editStory: function(e) {
+         this.fire('editStory', {name: e.target.ref});
+     },
+
+     deleteStory: function(e) {
+         this.fire('deleteStory', {name: e.target.ref});
+     },
+
+     loadModel: function(e) {
+         this.fire('loadModel', {url: e.target.ref});
+     },
+
+     editModel: function(e) {
+         this.fire('editModel', {data: e.target.ref});
+     },
+
+     deleteModel: function(e) {
+         this.fire('deleteModel', {id: e.target.ref});
+     },
+     
+     toggleDrawer: function() {
+         $('#drawer')[0].toggle();
+     },
+
+     expandResponse: function(e) {
+         this.storydata = this.storydata.map(function (s) {
+             if (!s.hasOwnProperty('name')) {
+                 return {name:s, semcheck:false, error:'on noes'};
+             } else {
+                 return s;
+             }
+         });
+         this.storydata = this.storydata.map(function (s) {
+             console.log(window.sem[s.name]);
+             if (window.sem.hasOwnProperty(s.name)) {
+                 return {name:s.name, semcheck:false, error:window.sem[s.name]};
+             } else {
+                 return {name:s.name, semcheck:true, error:''};
+             }
+         });
+     }
+
+ });
+</script>
+

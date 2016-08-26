@@ -1,0 +1,88 @@
+<dom-module id="shared-styles">
+  <template>
+    <style is="custom-style">
+      .horizontal {
+      @apply(--layout-horizontal);
+      }
+      .flex {
+      @apply(--layout-flex);
+      }
+      .centered {
+      @apply(--layout-center-justified);
+      }
+      </style>
+      <style>
+        :root {
+        --normal-color : #00cc55;
+        --accent-color : #008800;
+        --background-color: #EEEEEE;
+
+        --paper-tabs  {
+        --paper-tabs-selection-bar-color : var(--accent-color);
+        --paper-tab-ink : var(--accent-color);
+        }
+        } 
+
+        
+        .l1 {
+        background-color : var(--normal-color);                 
+        height: 30px;
+        }
+
+        .l2 {
+        background-color : var(--background-color);
+        padding: 5px;
+        }
+
+        .l2_button {
+        background : white;
+        }
+
+        .toast {
+        }
+        
+        .toast_bad {
+        --paper-toast-background-color: red
+        }
+        
+        .toast_good {
+        --paper-toast-background-color: green
+        }
+
+        .spinner { --paper-spinner-color: var(--normal-color); }
+
+        .toolbar {
+        --paper-toolbar-background: var(--normal-color);
+        }
+
+        #drawer {
+        --app-drawer-content-container: {
+        background-color: var(--normal-color);
+        }
+        }
+        
+        .drawer-content {
+        height: 100%;
+        overflow: auto;
+        padding: 10px;
+        color:white;
+        }
+
+                 paper-checkbox {
+             --paper-checkbox-checked-color: var(--normal-color);
+             --paper-checkbox-checked-ink-color: white;
+             --paper-checkbox-unchecked-color: white;
+             --paper-checkbox-unchecked-ink-color: white;
+             --paper-checkbox-label-color: white;
+         }
+         
+         paper-checkbox .subtitle {
+             display: block;
+             font-size: 0.8em;
+             margin-top: 2px;
+             max-width: 150px;
+         }
+
+      </style>
+  </template>
+</dom-module>

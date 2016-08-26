@@ -1,0 +1,117 @@
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/conf.js"></script>
+
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/polymer/polymer.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-pages/iron-pages.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-icon/iron-icon.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-icons/iron-icons.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/app-layout/app-layout.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-tabs/paper-tabs.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-card/paper-card.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-button/paper-button.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-styles/typography.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-toast/paper-toast.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/google-youtube/google-youtube.html">
+
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/jquery/dist/jquery.min.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/yjs/y.js"></script>
+
+<script src="http://rwth-acis.github.io/syncmeta/yjs/html/js/lib/vendor/require.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/openapp.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/iwc.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/extendedLas2peerWidgetLibrary.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/yjs-sync.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/syncmeta-plugin.js"></script>
+
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/util.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lang.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/story.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/narrator.js"></script>
+
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/css/defaults.html">
+
+<style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+
+<dom-module id="story-viewer">
+    <template>
+        
+        <style include="shared-styles"></style>
+        <style is="custom-style">
+            .card-header {
+                @apply(--paper-font-headline);
+            }
+         
+         #cont {
+             background-color:var(--background-color);
+         }
+
+        </style>
+
+        <div id="cont" style="height:430px;overflow:auto;">
+
+            <paper-toolbar class="toolbar">
+                <paper-icon-button id="menu_button" icon="menu"></paper-icon-button>
+
+                <span id="story_title" class="title">Loading...</span>
+                <paper-icon-button id="undo_button" icon="reply"></paper-icon-button>
+                <paper-icon-button id="undo_button2" icon="reply-all"></paper-icon-button>
+                <paper-tooltip for="undo_button">Back to previous page</paper-tooltip>
+                <paper-tooltip for="undo_button2">Back to previous decision</paper-tooltip>
+               <!--<div hidden$="{{!editor}}"><paper-icon-button id="refresh_button" icon="refresh"></paper-icon-button></div>-->
+            </paper-toolbar>
+            <div style="width:100%;" class="horizontal centered">
+                <paper-card class="white" style="margin:10px; padding:5px;">
+                    <div id="card_title" class="card-header"></div>
+                    <div id="card_media" class="horizontal center-justified layout"><paper-spinner-lite class="spinner" active></paper-spinner-lite></div>
+                    <div id="card_caption" class="card-content"></div>
+                    <div id="card_links" class="card-actions"></div>
+                </paper-card>
+            </div>
+        </div>
+        <app-drawer id="drawer">
+            <div class="drawer-content">
+                <div>
+                    <h1>Settings</h1>
+                    <paper-checkbox hidden$="{{!editor}}" id="use_reqs" noink>
+                        Use Requirements
+                        <span class="subtitle">Hide story sections, which's requirements have not been fulfilled
+                            <button id="clean_visits" title="Forget history of visited sections">Clean</button>
+                        </span>
+                    </paper-checkbox>
+                <div>
+            </div>
+        </app-drawer>
+
+    </template>
+</dom-module>
+
+<script>
+ Polymer({
+     is: 'story-viewer',
+     
+     properties: {
+         editor : {
+             type : Boolean,
+             value : false
+         }
+     },
+
+     onResize: function() {
+         $('#cont').css('height', $(document).height());
+     },
+     
+     ready: function() {
+         narrator.init(this.editor);
+         $(document).resize(this.onResize);
+         this.onResize();
+     },
+
+     toggleDrawer: function() {
+         $('#drawer')[0].toggle();
+     }
+ });
+</script>

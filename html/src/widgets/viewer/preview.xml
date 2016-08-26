@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+  <ModulePrefs title="Story Viewer" description="" author="Jan Benscheid" author_email="benscheid@dbis.rwth-aachen.de" width="400" height="450">
+    <Require feature="opensocial-0.8"/>
+    <Require feature="openapp"/>
+    <Require feature="dynamic-height"/>
+    <OAuth>
+      <Service xmlns:openapp="http://www.role-project.eu/xml/openapp/opensocialext/" name="openapp" openapp:service="http://purl.org/role/terms/spaceService" openapp:permitReadAppend="http://purl.org/role/terms/data">
+        <Request method="" url=""/>
+        <Authorization url=""/>
+        <Access method="" url=""/>
+      </Service>
+    </OAuth>
+  </ModulePrefs>
+  <Content type="xml">
+    <![CDATA[
+             <head>
+             <meta charset="utf-8">
+             <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+             <title>Story Viewer</title>
+             
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/loginscript.js"></script>
+             <script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/webcomponentsjs/webcomponents-lite.js"></script>
+             
+             <link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/elements/narrator.html">
+             </head>
+             <body>
+
+             <story-viewer></story-viewer>
+             
+             </body>
+    ]]>
+  </Content>
+</Module>

@@ -1,0 +1,4 @@
+ROOT="http://rwth-acis.github.io/3DStorytellling/html/"
+ROLE="http://role-sandbox.eu/"
+LAS="http://localhost:1232"
+Y="http://yjs.dbis.rwth-aachen.de:5079"

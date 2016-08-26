@@ -1,0 +1,177 @@
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/conf.js"></script>
+
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/polymer/polymer.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-input/iron-input.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-pages/iron-pages.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-icon/iron-icon.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-icons/iron-icons.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/app-layout/app-layout.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-tabs/paper-tabs.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-input/paper-input.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-button/paper-button.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-styles/typography.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-toast/paper-toast.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-dialog/paper-dialog.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/neon-animation/animations/scale-down-animation.html">
+
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/elements/confirmDialog.html">
+
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/jquery/dist/jquery.min.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/x3dom/x3dom.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/yjs/y.js"></script>
+
+<script src="http://rwth-acis.github.io/syncmeta/yjs/html/js/lib/vendor/require.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/openapp.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/iwc.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/extendedLas2peerWidgetLibrary.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/yjs-sync.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/syncmeta-plugin.js"></script>
+
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/util.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/story.js"></script>
+<script src="http://rwth-acis.github.io/3DStorytellling/html/src/js/viewer.js"></script>
+
+<link rel="stylesheet" type="text/css" href="http://rwth-acis.github.io/3DStorytellling/html/src/js/lib/vendor/x3dom/x3dom.css"></link>
+<link rel="import" href="http://rwth-acis.github.io/3DStorytellling/html/src/css/defaults.html">
+
+<style is="custom-style" include="iron-flex"></style>
+
+<dom-module id="obj-viewer">
+    <template>
+
+        <style include="shared-styles"></style>
+        <style>
+         #elem {
+             border: none;
+         }
+         #follower{
+             position: absolute;
+             padding: 4px;
+             background-color: white;
+             transform-origin: 100% 0;
+             margin-bottom: 20px;
+             margin-left: 20px;
+             box-shadow: 2px 2px 10px black;
+             visibility: hidden;
+         }
+        </style>
+        <paper-tooltip for="default_view_button">Reset view</paper-tooltip>
+        <!--    <paper-tooltip for="refresh_button">Refresh</paper-tooltip> -->
+
+        <paper-toolbar class="toolbar">
+            <paper-icon-button id="menu_button" icon="menu"></paper-icon-button>
+
+            <span id="story_title" class="title"></span>
+            <paper-icon-button id="default_view_button" icon="visibility">
+
+            </paper-icon-button>
+        <!--<div hidden$="{{!editor}}"><paper-icon-button id="refresh_button" icon="refresh" disabled> -->
+            </paper-icon-button></div>
+        </paper-toolbar>
+
+        <div hidden$="{{!editor}}">
+            <paper-tabs class="l1" id="tabs" selected={{mode}}>
+                <paper-tab>VIEW</paper-tab>
+                <paper-tab>TAG</paper-tab>
+            </paper-tabs>
+        </div>
+
+        <div>
+            <div hidden$="{{!editor}}" class="l2">
+                <iron-pages selected={{mode}}>
+                    <div>
+                        <input id="curr_view" value='position="0 0 0" orientation="0 0 0 0'>
+                        <button id="curr_view_button" type="button" disabled>Save!</button> 
+                    </div>
+                    <div>
+                        <input id="curr_tag" value='position="0 0 0" orientation="0 0 0 0'>
+                        <button id="curr_tag_button" type="button" disabled>Save!</button> 
+                    </div>
+                </iron-pages>
+                <paper-toast id="toast_cp" class="toast_good" text="Success!"></paper-toast>
+                <paper-toast id="toast_cp_fail" class="toast_bad" text="An error occurred"></paper-toast>
+            </div>
+            <div id="div_3d">
+                <paper-dialog id="tag_dialog" entry-animation="scale-up-animation" exit-animation="scale-down-animation" style="width: 420px">
+                    <h2 id="tag_header">Header</h2>
+                    <div id="tag_text">Lorem ipsum</div>
+                    <div class="buttons">
+                        <paper-button dialog-dismiss>Close</paper-button>
+                    </div>
+                </paper-dialog>
+
+                <x3d id="elem" width="99vw" height$="{{_height3d(editor)}}" onmouse> 
+                    <scene id="scene"">
+                        <navigationInfo type='"any"' id="navType"></navigationInfo>
+                        <transform>
+	                    <inline id="inline" onload="$('#scene').trigger('modelLoaded');"> </inline>
+                        </transform>
+                    </scene> 
+                </x3d>
+            </div>
+            <div id="follower">	&rarr; mouse</div>
+        </div>
+
+        <app-drawer id="drawer">
+            <div class="drawer-content">
+                <div>
+                    <h1>3D MODEL</h1>
+                    Insert the URL the of the 3D model (e.g. http://abc.de/model.x3d) and click 'apply'
+                    <form id="model_form" action="">
+                        <input type="text" name="modelURL" style="display: inline;">
+                        <input type="submit" value="Apply">
+                    </form> 
+                </div>
+            </div>
+        </app-drawer>
+        <confirm-dialog id="confirm"></confirm-dialog>
+    </template>
+</dom-module>
+
+<script>
+ Polymer({
+     is: 'obj-viewer',
+     
+     properties: {
+         model: {
+             type: String,
+             value: '121'
+         },
+
+         mode: {
+             type: Number,
+             value: 0,
+             observer: '_modeChanged'
+         },
+         
+         editor: {
+             type : Boolean,
+             value : false
+         }
+     },
+
+     ready: function() {
+         viewer.init(this.editor, this.model);
+     },
+
+     _modeChanged: function(index) {
+         if (index == 0) {
+             this.fire('leaveTagMode');
+         } else {
+             this.fire('enterTagMode');
+         }
+     },
+
+     _height3d: function(editor) {
+         return editor ? '70vh' : '88vh';
+     },
+
+     toggleDrawer: function() {
+         $('#drawer')[0].toggle();
+     }
+ });
+</script>
