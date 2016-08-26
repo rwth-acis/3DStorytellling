@@ -18,3 +18,4 @@ npm-debug.log
 config/database.js
 scripts/raw/*
 *.tern-port
+html/
