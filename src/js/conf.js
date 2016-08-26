@@ -1,8 +1,6 @@
 var conf = {
   external : {
     ROOT : 'http://localhost:8082/',
-    OBJECT_ROOT : 'http://localhost:8082/assets/',
-    STORY_ROOT : 'http://localhost:8082/assets/',
     ROLE : 'http://127.0.0.1:8073/',
     editor : 'storyeditor',
     viewer : 'storyviewer',
