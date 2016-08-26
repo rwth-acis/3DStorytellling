@@ -3,6 +3,8 @@ read ROOT
 
 OLD_ROOT="http://localhost:8082/"
 
+bower install
+
 rm -rf html
 mkdir html
 cp -r src html/
