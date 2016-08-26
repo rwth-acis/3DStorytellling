@@ -26,6 +26,7 @@ browser.init = function (eM) {
         editorMode = eM,
         selectedStory = null,
         context = null,
+        semresult = null,
         blocker = new util.Blocker(conf.general.refresh_timeout),
         iwcClient = new Las2peerWidgetLibrary(conf.external.LAS,
                                               function () {}, "ATTRIBUTE");
@@ -94,11 +95,13 @@ browser.init = function (eM) {
                                 if (window.sem.hasOwnProperty(name)) {
                                   delete window.sem[name];
                                 }
+                                syncmeta.setAttributeValue('modelAttributes', '_semcheck', true);
                                 $poly.expandResponse();
                               } else {
                                 var msg = parseSemanticError(data);
                                 window.sem[name] = msg;
                                 $poly.expandResponse();
+                                syncmeta.setAttributeValue('modelAttributes', '_semcheck', false);
                               }
                             },
                             function (error, xhr) {
@@ -109,6 +112,10 @@ browser.init = function (eM) {
 
     var storyChanged = function (events) {
       console.log("browser noticed change", events);
+      if (events === true || events === false) {
+        console.log("change is irrelevant for browser");
+        return;
+      }
       changes = true;
     };
 
@@ -138,6 +145,7 @@ browser.init = function (eM) {
         console.log(values);
         var newname = values.storyName;
         model.attributes.label.value.value = newname;
+        syncmeta.setAttributeValue('modelAttributes', 'label', newname);
         iwcClient
           .sendRequest('POST', 'CAE/models',
                        JSON.stringify(model),
