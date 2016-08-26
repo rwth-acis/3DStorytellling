@@ -17,6 +17,11 @@ Story.EDGES = {
   NAME : "Name",
 };
 
+Story.ATTRIBUTES = {
+  MODEL : "3D Model",
+  SEM : "_semcheck"
+};
+
 Story.NODES = {
   TYPES : {
     VIDEO : "Video",
@@ -76,6 +81,13 @@ Story.prototype.getState = function () {
  */
 Story.prototype.setStart = function (start) {
   this.start = start;
+};
+
+Story.prototype.getModelAttribute = function (name) {
+  return this.data
+      .attributes
+      .attributes['modelAttributes['+name.toLowerCase()+']']
+      .value.value;
 };
 
 /**

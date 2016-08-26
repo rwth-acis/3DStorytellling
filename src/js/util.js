@@ -79,6 +79,13 @@ util = {
     plugin.onEdgeAttributeChange(cb);
     plugin.onNodeDelete(cb);
     plugin.onEdgeDelete(cb);
+  },
+
+  getModelAttribute : function (model, name) {
+    return model
+      .attributes
+      .attributes['modelAttributes['+name.toLowerCase()+']']
+      .value.value;
   }
 };
 

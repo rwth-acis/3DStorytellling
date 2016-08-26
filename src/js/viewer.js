@@ -44,7 +44,7 @@ viewer.init = function (eM, m) {
         buffer = "",
         editorMode = eM,
         maskMode = !eM,
-        model = "",
+        model3d = "",
         cones = new Cones($scene),
         blocker = new util.Blocker(conf.general.refresh_timeout),
         coneSizeUpdateBlocker = new util.Blocker(conf.general.cones_scale_timeout),
@@ -64,9 +64,10 @@ viewer.init = function (eM, m) {
           syncmeta.init(y);
           util.subscribeY(syncmeta, storyChanged);
 
-          initStory(y.share.data.get('model'));
-          model = y.share.data.get('model3d') || m;
-          loadModel(model);
+          var model = y.share.data.get('model');
+          initStory(model);
+          model3d = story.getModelAttribute(Story.ATTRIBUTES.MODEL);
+          loadModel(model3d);
           
           // Buttons
           $modelForm.submit(submitModel);
@@ -247,14 +248,14 @@ viewer.init = function (eM, m) {
       }
       console.log("narrator applies change");
       changes = false;
-      var newModel = window.y.share.data.get('model3d');
-      if (newModel != model) {
+      var model = window.y.share.data.get('model');
+      story.update(model);
+      var newModel = story.getModelAttribute(Story.ATTRIBUTES.MODEL);
+      if (newModel != model3d) {
         loadModel(newModel);
-        model = newModel;
       }
-      story.update(window.y.share.data.get('model'));
-      console.log(window.y.share.data.get('model'));
-      
+      console.log(model);
+
       blocker.execute(function () {
         show();
         console.log('refresh viewer');
@@ -268,11 +269,12 @@ viewer.init = function (eM, m) {
 
     var submitModel = function (e) {
       var values = util.serializeForm($modelForm);
+      var url = values['modelURL'];
       console.log(values);
       $confirm.popup("Changing the model won't change the position of tags or views you already set up. Continue?", 'Yes')
         .then(function () {
-          loadModel(values['modelURL']);
-          $drawer[0].toggle();
+          syncmeta.setAttributeValue('modelAttributes', '3D Model', url);
+          $drawer[0].close();
         });
       return false;
     };
@@ -281,6 +283,8 @@ viewer.init = function (eM, m) {
      * Tells x3dom the new URL to load model from
      */
     var loadModel = function (path) {
+      model3d = path;
+      $modelForm.find('[name="modelURL"]').val(path),
       console.log('loading model from: '+path);
       $inline.attr('url', path);
     };
