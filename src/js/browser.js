@@ -311,6 +311,7 @@ browser.init = function (eM) {
       
       yjsSync(room).done(function (yInstance) {
         yInstance.share.data.set('model', model);
+        yInstance.share.canvas.set('ReloadWidgetOperation', 'import');
         deferred.resolve();
       });
 

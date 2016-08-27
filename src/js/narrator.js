@@ -58,6 +58,15 @@ narrator.init = function (eM) {
           $cleanVisits.on('click', function () {
             visited = new Array();
           });
+
+          y.share.canvas.observe(function (event) {
+            console.log(event);
+            if (event.name == 'ReloadWidgetOperation') {
+              changes = 1;
+              story.setState(null);
+              storyUpdated();
+            }
+          });
         };
 
     /**

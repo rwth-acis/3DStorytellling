@@ -93,6 +93,14 @@ viewer.init = function (eM, m) {
           $scene.on('tagClick', handleTagClick);
           $scene.on('tagLeave', handleTagLeave);
           $scene.on('modelLoaded', onModelLoaded);
+
+          y.share.canvas.observe(function (event) {
+            console.log(event);
+            if (event.name == 'ReloadWidgetOperation') {
+              changes = 1;
+              storyUpdated();
+            }
+          });
         };
 
 
