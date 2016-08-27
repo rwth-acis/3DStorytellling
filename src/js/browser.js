@@ -98,7 +98,12 @@ browser.init = function (eM) {
       var deferred = $.Deferred();
 
       var model = window.y.share.data.get('model');
-      var name = util.getModelAttribute(model, 'Description');
+      var story = new Story(model);
+      if (story.isEmpty()) {
+        deferred.fail();
+        return deferred.promise();
+      }
+      var name = story.getName();
       iwcClient.sendRequest('PUT', 'CAE/semantics',
                             JSON.stringify(model),
                             'application/json',
@@ -153,7 +158,8 @@ browser.init = function (eM) {
 
     var saveStoryButtonClick = function (e) {
       var model = window.y.share.data.get('model');
-      var name = util.getModelAttribute(model, 'Description');
+      var story = new Story(model);
+      var name = story.getName();
 
       $editStoryDialog.find('[name="storyName"]').val(name);
       $editStoryDialog[0].open();
@@ -162,9 +168,15 @@ browser.init = function (eM) {
         var values = util.serializeForm($storyForm);
         console.log(values);
         var newname = values.storyName;
+        syncmeta.setAttributeValue('modelAttributes', 'Description', newname);
 
         var model = window.y.share.data.get('model');
-        var name = util.getModelAttribute(model, 'Description');
+        var story = new Story(model);
+        if (story.isEmpty()) {
+          $toastFail.attr('text', 'You can not submit an empty story');
+          $toastFail[0].open();
+          return;
+        }
         
         //*******************
         // Warning: The CAE backend determines the name by looking at:
@@ -180,9 +192,8 @@ browser.init = function (eM) {
         model.attributes.label.value.value = newname;
         // ******************
         
-        syncmeta.setAttributeValue('modelAttributes', 'Description', newname);
-
         semcheck().then(function () {
+          model = window.y.share.data.get('model');
           iwcClient
             .sendRequest('POST', 'CAE/models',
                          JSON.stringify(model),
@@ -208,7 +219,7 @@ browser.init = function (eM) {
                                                         type);
                                           },
                                           function (error, xhr) {
-                                            handleSubmitError(error);
+                                            handleSubmitError(error, xhr);
                                             console.log(error);
                                           });
                          });
@@ -221,7 +232,11 @@ browser.init = function (eM) {
       try {
         e = JSON.parse(e);
       } catch (ex) {
-        $toastFail.attr('text', e+" Press [Escape] to close.");
+        if (e.indexOf('This model was supposed') !== -1) {
+          $toastFail.attr('text', "Conflict! Try again in a few seconds...");
+        } else {
+          $toastFail.attr('text', e+" Press [Escape] to close.");
+        }
         $toastFail[0].open();
         return;
       }

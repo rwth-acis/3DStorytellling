@@ -425,6 +425,9 @@ Story.prototype.fall = function (id) {
  * @return {string} the name of the story
  */
 Story.prototype.getName = function () {
+  if (this.isEmpty()) {
+    return "New Story";
+  }
   return this.getModelAttribute(Story.ATTRIBUTES.NAME);
 };
 
