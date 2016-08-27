@@ -15,6 +15,7 @@ Story.EDGES = {
     REQUIREMENT : "Requirement"
   },
   NAME : "Name",
+  SHOW : "Show in story widget"
 };
 
 Story.ATTRIBUTES = {
@@ -253,13 +254,22 @@ Story.prototype.getView = function (id) {
  * @return {[string]} 
  */
 Story.prototype.getTags = function (id) {
-  if (this.getNodeType(id) == Story.NODES.TYPES.TAG) {
+  if (this.getEntityType(id) == Story.NODES.TYPES.TAG) {
     var attr = this.getNodeAttributes(id);
     return [{
       title : attr[Story.NODES.MEDIA.TAG_NAME],
       position : attr[Story.NODES.MEDIA.TAG_POSITION],
       description : attr[Story.NODES.MEDIA.TAG_DESCRIPTION],
       color : attr[Story.NODES.MEDIA.TAG_COLOR],
+      nodeId : id
+    }];
+  } else if (this.getEntityType(id) == Story.EDGES.TYPES.TRANSITION) {
+    var attr = this.getAnyAttributes(id);
+    return [{
+      title : attr[Story.EDGES.TAG_NAME],
+      position : attr[Story.NODES.MEDIA.TRANSITION_TAG],
+      description : "",
+      color : "orange",
       nodeId : id
     }];
   }
@@ -291,7 +301,7 @@ Story.prototype.getTags = function (id) {
  * @param {bool} mask - only return next steps that filfill the requirements
  * @return {obj} {int:{target:int,name:string}}
  */
-Story.prototype.getStoryTransitions = function (id, mask) {
+Story.prototype.getStoryTransitions = function (id, mask, hidden) {
   var edges = this.getAdjacentEdges(id);
   var res = {};
   
@@ -301,7 +311,8 @@ Story.prototype.getStoryTransitions = function (id, mask) {
     }
 
     var curr = edges[edgeId];
-    if (curr.type == Story.EDGES.TYPES.TRANSITION && curr.dir === 1) {
+    if (curr.type == Story.EDGES.TYPES.TRANSITION &&
+        curr.dir === 1) {
       if (mask) {
         var reqs = this.getRequirements(curr.target);
         if (!util.containsAll(mask, reqs)) {
@@ -312,7 +323,8 @@ Story.prototype.getStoryTransitions = function (id, mask) {
       res[edgeId] = {
         target : curr.target,
         name : curr.attributes[Story.EDGES.NAME],
-        tag : curr.attributes[Story.NODES.MEDIA.TRANSITION_TAG]
+        tag : curr.attributes[Story.NODES.MEDIA.TRANSITION_TAG],
+        inViewer : curr.attributes[Story.EDGES.SHOW]
       }
     }
   }

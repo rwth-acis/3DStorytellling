@@ -127,6 +127,7 @@ viewer.init = function (eM, m) {
               cones.createFromMeta(story.getTags(id)[0]);
               cones.adjustSizes(getCameraPosition());
             }
+            console.log('selecting', id);
             selectTag(id);
             $currTagButton.prop('disabled',false);
           } else {

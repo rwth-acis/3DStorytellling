@@ -110,7 +110,7 @@ narrator.init = function (eM) {
       if (payload && payload.type == conf.operations.entitySelect) {
         var data = JSON.parse(payload.data);
         var id = data.selectedEntityId;
-        if (Story.NODES.TYPES.MEDIA.includes(story.getNodeType(id))) {
+        if (Story.NODES.TYPES.MEDIA.includes(story.getEntityType(id))) {
           display(id);
         }
       }
@@ -269,7 +269,7 @@ narrator.init = function (eM) {
 
       $cardLinks.html('');
       for (var edgeId in next) {
-        if (!next.hasOwnProperty(edgeId)) {
+        if (!next.hasOwnProperty(edgeId) || !next[edgeId].inViewer) {
           continue;
         }
 
