@@ -6,6 +6,7 @@ browser.init = function (eM) {
     var $addStory = $('#plus_button_stories'),
         $confirm = $('#confirm')[0],
         $saveStory = $('#save_button_stories'),
+        $refreshButton = $('#refresh_button'),
         $poly = document.querySelector('story-browser'),
         $loaded = $('#loaded_dialog'),
         $linked = $('#link_dialog'),
@@ -37,6 +38,7 @@ browser.init = function (eM) {
           if (editorMode) {
             syncmeta.init(y);
             util.subscribeY(syncmeta, storyChanged);
+            
             y.share.data.observe(storyUpdated);
           }
           
@@ -45,9 +47,11 @@ browser.init = function (eM) {
           });
           $addStory.on('click', addStoryButtonClick);
           $saveStory.on('click', saveStoryButtonClick);
+          $refreshButton.on('click', refresh);
           $storySubmit.on('click', submitStory);
           $sureButton.on('click', sure);
           $poly.addEventListener('loadStory', loadStory);
+          $poly.addEventListener('refresh', afterRefresh);
           $poly.addEventListener('editStory', editStoryClick);
           $poly.addEventListener('deleteStory', deleteStoryClick);
         };
@@ -61,6 +65,14 @@ browser.init = function (eM) {
       }
     };
 
+    var refresh = function () {
+      $storiesAjax[0].generateRequest();
+    };
+
+    var afterRefresh = function () {
+      semcheck();
+    };
+    
     ///////////////////////////////////////////////////////////////
     // Story Related
     ///////////////////////////////////////////////////////////////
@@ -82,6 +94,8 @@ browser.init = function (eM) {
     };
 
     var semcheck = function () {
+      var deferred = $.Deferred();
+
       var model = window.y.share.data.get('model');
       var name = util.getModelAttribute(model, 'Description');
       iwcClient.sendRequest('PUT', 'CAE/semantics',
@@ -95,19 +109,24 @@ browser.init = function (eM) {
                                 if (window.sem.hasOwnProperty(name)) {
                                   delete window.sem[name];
                                 }
-                                syncmeta.setAttributeValue('modelAttributes', '_semcheck', true);
+                                syncmeta.setAttributeValue('modelAttributes',
+                                                           '_semcheck', true);
                                 $poly.expandResponse();
                               } else {
                                 var msg = parseSemanticError(data);
                                 window.sem[name] = msg;
                                 $poly.expandResponse();
-                                syncmeta.setAttributeValue('modelAttributes', '_semcheck', false);
+                                syncmeta.setAttributeValue('modelAttributes',
+                                                           '_semcheck', false);
                               }
+                              deferred.resolve();
                             },
                             function (error, xhr) {
                               handleSubmitError(error);
                               console.log(error);
+                              deferred.fail();
                             });
+      return deferred.promise();
     };
 
     var storyChanged = function (events) {
@@ -136,15 +155,20 @@ browser.init = function (eM) {
     };
 
     var saveStoryButtonClick = function (e) {
-
       var model = window.y.share.data.get('model');
       var name = util.getModelAttribute(model, 'Description');
-      
+
+      $editStoryDialog.find('[name="storyName"]').val(name);
+      $editStoryDialog[0].open();
+
       onEditModelClose = function () {
         var values = util.serializeForm($storyForm);
         console.log(values);
         var newname = values.storyName;
 
+        var model = window.y.share.data.get('model');
+        var name = util.getModelAttribute(model, 'Description');
+        
         //*******************
         // Warning: The CAE backend determines the name by looking at:
         // attributes.label.value.value
@@ -160,38 +184,40 @@ browser.init = function (eM) {
         // ******************
         
         syncmeta.setAttributeValue('modelAttributes', 'Description', newname);
-        iwcClient
-          .sendRequest('POST', 'CAE/models',
-                       JSON.stringify(model),
-                       'application/json',
-                       function (data, type) {
-                         console.log('model stored', data, type);
-                         $storiesAjax[0].generateRequest();
-                       },
-                       function (error, xhr) {
-                         console.log('errror', error, xhr);
-                         if (xhr.status == 400) {
-                           handleSubmitError(error, xhr);
-                           return;
-                         }
-                         iwcClient
-                           .sendRequest('PUT', 'CAE/models/'+newname,
-                                        JSON.stringify(model),
-                                        'application/json',
-                                        function (data, type) {
-                                          $storiesAjax[0].generateRequest();
-                                          $toastWin[0].open();
-                                          console.log('model stored', data, type);
-                                        },
-                                        function (error, xhr) {
-                                          handleSubmitError(error);
-                                          console.log(error);
-                                        });
-                       });
+
+        semcheck().then(function () {
+          iwcClient
+            .sendRequest('POST', 'CAE/models',
+                         JSON.stringify(model),
+                         'application/json',
+                         function (data, type) {
+                           console.log('model stored', data, type);
+                           $storiesAjax[0].generateRequest();
+                         },
+                         function (error, xhr) {
+                           console.log('errror', error, xhr);
+                           if (xhr.status == 400) {
+                             handleSubmitError(error, xhr);
+                             return;
+                           }
+                           iwcClient
+                             .sendRequest('PUT', 'CAE/models/'+newname,
+                                          JSON.stringify(model),
+                                          'application/json',
+                                          function (data, type) {
+                                            $storiesAjax[0].generateRequest();
+                                            $toastWin[0].open();
+                                            console.log('model stored', data,
+                                                        type);
+                                          },
+                                          function (error, xhr) {
+                                            handleSubmitError(error);
+                                            console.log(error);
+                                          });
+                         });
+          
+        });
       };
-      
-      $editStoryDialog.find('[name="storyName"]').val(name);
-      $editStoryDialog[0].open();
     };
 
     var handleSubmitError = function (e, xhr) {
