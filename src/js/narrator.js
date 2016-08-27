@@ -93,8 +93,8 @@ narrator.init = function (eM) {
       });
     };
 
-    var storyChanged = function (events) {
-      console.log("narrator noticed change", events);
+    var storyChanged = function (events, b,c,d) {
+      console.log("narrator noticed change", events,b,c,d);
       changes = conf.general.reload_trials;
     };
     

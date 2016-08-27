@@ -55,6 +55,15 @@ util = {
       elem.append(video);
     }
   },
+  
+  /**
+   * embeds a video inside an arbitrary dom-element (use the card_media)
+   * @param {dom} elem 
+   * @param {string} url - Only youtube links supported atm
+   */
+  embedError : function (elem) {
+    elem.text('currently not supported');
+  },
 
   /**
    * embeds a video inside an arbitrary dom-element (use the card_media)
@@ -74,11 +83,18 @@ util = {
   },
 
   subscribeY : function (plugin, cb) {
-    plugin.onEntityAdd(cb);
-    plugin.onNodeAttributeChange(cb);
-    plugin.onEdgeAttributeChange(cb);
-    plugin.onNodeDelete(cb);
-    plugin.onEdgeDelete(cb);
+    var cond = function (a,b,c) {
+      if (c && c.indexOf("_semcheck") !== -1) {
+        return;
+      }
+      cb(a,b,c);
+    };
+    
+    plugin.onEntityAdd(cond);
+    plugin.onNodeAttributeChange(cond);
+    plugin.onEdgeAttributeChange(cond);
+    plugin.onNodeDelete(cond);
+    plugin.onEdgeDelete(cond);
   },
 
   getModelAttribute : function (model, name) {

@@ -131,10 +131,6 @@ browser.init = function (eM) {
 
     var storyChanged = function (events) {
       console.log("browser noticed change", events);
-      if (events === true || events === false) {
-        console.log("change is irrelevant for browser");
-        return;
-      }
       changes = conf.general.reload_trials;
     };
 
