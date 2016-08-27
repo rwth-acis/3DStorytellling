@@ -257,42 +257,30 @@ browser.init = function (eM) {
 
       $confirm.popup('Are you sure?', 'Yes')
         .then(function () {
-          appendStory(true);
+          load(true, null);
         });
       
     };
     
     var loadStory = function (e) {
-      $confirm.popup('Are you sure?', 'Yes')
-        .then(function () {
-          console.log('appending story');
-          appendStory(false, e.detail.name);
+      var name = e.detail.name;
+      $confirm.popup('Are you sure?', 'Yes').then(function () {
+        downloadStory(name).then(function (obj) {
+          load(false, obj);
         });
+      });
     };
     
     var editStoryClick = function (e) {
 
-      $confirm.popup('Are you sure?', 'Yes')
-        .then(function () {
-          appendStory(true, e.detail.name);
+      var name = e.detail.name;
+      $confirm.popup('Are you sure?', 'Yes').then(function () {
+        downloadStory(name).then(function (obj) {
+          console.log('obj', obj);
+          load(true, obj);
         });
+      });
       
-    };
-    
-    var appendStory = function (toEditor, name) {
-      var deferred = $.Deferred();
-
-      if (!name) {
-        load(toEditor, null).then(function () {
-          deferred.resolve();
-        });
-      } else {
-        load(toEditor, name).then(function () {
-          deferred.resolve();
-        });
-      }
-
-      return deferred;
     };
 
     var load = function (toEditor, obj) {
@@ -302,14 +290,17 @@ browser.init = function (eM) {
         console.log('cross loading');
         crossLoad(space, obj)
           .then(function () {
+            console.log($redirector);
             $redirector.attr('href', conf.external.ROLE + 'spaces/' + space);
-            $confirm.popup('You will now be redirected to the editor', 'Ok')
+            //            $confirm.popup('You will now be redirected to the editor', 'Ok')
+            $linked[0].open();
             deferred.resolve(false);
           });
       } else {
-        console.log('loading info same space');
+        console.log('loading info same space', obj);
         window.y.share.data.set('model', obj);
-        $confirm.popup('Please refresh the page', 'Ok')
+        y.share.canvas.set('ReloadWidgetOperation', 'import');
+//        $confirm.popup('Please refresh the page', 'Ok')
         deferred.resolve(true);
       }
       return deferred;
@@ -326,6 +317,23 @@ browser.init = function (eM) {
       return deferred.promise();
     };
 
+    var downloadStory = function (name) {
+      var deferred = $.Deferred();
+      
+      iwcClient
+        .sendRequest('GET', 'CAE/models/'+name,
+                     '', null,
+                     function (data, type) {
+                       console.log('model fetched', data, type);
+                       deferred.resolve(data);
+                     },
+                     function (error, xhr) {
+                       console.log('error while loading');
+                       deferred.fail();
+                     });
+      return deferred.promise();
+    };
+    
     _init();
   });
 };
