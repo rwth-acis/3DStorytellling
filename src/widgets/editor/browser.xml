@@ -26,7 +26,7 @@
              <title>Story Browser</title>
 
 <script src="http://localhost:8082/src/js/loginscript.js"></script>
-<script src="http://localhost:8082/src/js/lib/webcomponentsjs/webcomponents-lite.js"></script>
+<script src="http://localhost:8082/src/js/lib/vendor/webcomponentsjs/webcomponents-lite.js"></script>
              
              <link rel="import" href="http://localhost:8082/src/elements/browser.html">
              </head>
