@@ -64,6 +64,9 @@ narrator.init = function (eM) {
             if (event.name == 'ReloadWidgetOperation') {
               changes = 1;
               story.setState(null);
+              path = new Array();
+              forkPath = new Array();
+              visited = new Array();
               storyUpdated();
             }
           });

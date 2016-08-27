@@ -50,6 +50,7 @@ browser.init = function (eM) {
           $refreshButton.on('click', refresh);
           $storySubmit.on('click', submitStory);
           $sureButton.on('click', sure);
+          $storyForm.submit(function(){return false;});
           $poly.addEventListener('loadStory', loadStory);
           $poly.addEventListener('refresh', afterRefresh);
           $poly.addEventListener('editStory', editStoryClick);
