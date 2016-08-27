@@ -69,13 +69,13 @@ browser.init = function (eM) {
     /**
      * Callback for when the story changed
      */
-    var changes = false;
+    var changes = 0;
     var storyUpdated = function (events) {
-      if (!changes) {
+      if (changes <= 0) {
         return;
       }
       console.log("browser applies change");
-      changes = false;
+      changes--;
       blocker.execute(function () {
         semcheck();
       });
@@ -83,7 +83,7 @@ browser.init = function (eM) {
 
     var semcheck = function () {
       var model = window.y.share.data.get('model');
-      var name = model.attributes.label.value.value || '';
+      var name = util.getModelAttribute(model, 'Description');
       iwcClient.sendRequest('PUT', 'CAE/semantics',
                             JSON.stringify(model),
                             'application/json',
@@ -116,7 +116,7 @@ browser.init = function (eM) {
         console.log("change is irrelevant for browser");
         return;
       }
-      changes = true;
+      changes = conf.general.reload_trials;
     };
 
     var deleteStoryClick = function (e) {
@@ -138,14 +138,28 @@ browser.init = function (eM) {
     var saveStoryButtonClick = function (e) {
 
       var model = window.y.share.data.get('model');
-      var name = model.attributes.label.value.value || '';
+      var name = util.getModelAttribute(model, 'Description');
       
       onEditModelClose = function () {
         var values = util.serializeForm($storyForm);
         console.log(values);
         var newname = values.storyName;
+
+        //*******************
+        // Warning: The CAE backend determines the name by looking at:
+        // attributes.label.value.value
+        // There is of course no valid SyncMeta API to collaboratively change
+        // this value, because it technically describes the name of the
+        // "Model Attributes" node, and should not have any other value!
+        // However, I don't have the time to make this change to CAE, and
+        // therefore stick to this odd behaviour. In order to be able to
+        // collaboratively manipulate the story name, I use the
+        // otherwise currently unused "Description" model attributte, and
+        // write it to the label value only shortly before submission to CAE.
         model.attributes.label.value.value = newname;
-        syncmeta.setAttributeValue('modelAttributes', 'label', newname);
+        // ******************
+        
+        syncmeta.setAttributeValue('modelAttributes', 'Description', newname);
         iwcClient
           .sendRequest('POST', 'CAE/models',
                        JSON.stringify(model),
@@ -229,6 +243,7 @@ browser.init = function (eM) {
     var loadStory = function (e) {
       $confirm.popup('Are you sure?', 'Yes')
         .then(function () {
+          console.log('appending story');
           appendStory(false, e.detail.name);
         });
     };
@@ -262,6 +277,7 @@ browser.init = function (eM) {
       var deferred = $.Deferred();
       var space = toEditor ? conf.external.editor : conf.external.viewer;
       if (editorMode != toEditor) {
+        console.log('cross loading');
         crossLoad(space, obj)
           .then(function () {
             $redirector.attr('href', conf.external.ROLE + 'spaces/' + space);
@@ -269,6 +285,7 @@ browser.init = function (eM) {
             deferred.resolve(false);
           });
       } else {
+        console.log('loading info same space');
         window.y.share.data.set('model', obj);
         $confirm.popup('Please refresh the page', 'Ok')
         deferred.resolve(true);

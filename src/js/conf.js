@@ -11,6 +11,7 @@ var conf = {
     refresh_timeout : 1000,
     cones_scale_timeout : 200,
     semcheck_timeout : 2000,
+    reload_trials : 2
   },
   y : {
     ROOM_EDITOR : '3dst_editor',

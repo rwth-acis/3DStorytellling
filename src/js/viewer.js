@@ -241,13 +241,13 @@ viewer.init = function (eM, m) {
     /**
      * Callback when story graph changed
      */
-    var changes = false;
+    var changes = 0;
     var storyUpdated = function (events) {
-      if (!changes) {
+      if (changes <= 0) {
         return; 
       }
       console.log("narrator applies change");
-      changes = false;
+      changes--;
       var model = window.y.share.data.get('model');
       story.update(model);
       var newModel = story.getModelAttribute(Story.ATTRIBUTES.MODEL);
@@ -264,7 +264,7 @@ viewer.init = function (eM, m) {
     
     var storyChanged = function (events) {
       console.log("viewer noticed change", events);
-      changes = true;
+      changes = conf.general.reload_trials;
     };
 
     var submitModel = function (e) {

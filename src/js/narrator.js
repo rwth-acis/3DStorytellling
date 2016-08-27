@@ -80,13 +80,13 @@ narrator.init = function (eM) {
     /**
      * Callback for when the story changed
      */
-    var changes = false;
+    var changes = 0;
     var storyUpdated = function (events) {
-      if (!changes) {
+      if (changes <= 0) {
         return;
       }
       console.log("narrator applies change");
-      changes = false;
+      changes--;
       blocker.execute(function () {
         refresh();
         console.log('refresh narrator');
@@ -95,7 +95,7 @@ narrator.init = function (eM) {
 
     var storyChanged = function (events) {
       console.log("narrator noticed change", events);
-      changes = true;
+      changes = conf.general.reload_trials;
     };
     
     
