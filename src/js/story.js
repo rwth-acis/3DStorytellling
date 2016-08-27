@@ -19,7 +19,8 @@ Story.EDGES = {
 
 Story.ATTRIBUTES = {
   MODEL : "3D Model",
-  SEM : "_semcheck"
+  SEM : "_semcheck",
+  NAME : "Description"
 };
 
 Story.NODES = {
@@ -412,11 +413,7 @@ Story.prototype.fall = function (id) {
  * @return {string} the name of the story
  */
 Story.prototype.getName = function () {
-  var root = this.getRoot();
-  if (!root) {
-    return null;
-  }
-  return this.getNodeAttributes(root)[Story.NODES.TITLE];
+  return this.getModelAttribute(Story.ATTRIBUTES.NAME);
 };
 
 /**
