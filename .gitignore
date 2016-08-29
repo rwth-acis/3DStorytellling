@@ -19,3 +19,4 @@ config/database.js
 scripts/raw/*
 *.tern-port
 html/
+buildcfg/root
