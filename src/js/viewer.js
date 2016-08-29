@@ -118,34 +118,72 @@ viewer.init = function (eM, m) {
           }
 
           var id = JSON.parse(payload.data).selectedEntityId;
-          var nodeType = story.getEntityType(id);
-
-          switch (nodeType) {
-          case Story.NODES.TYPES.VIEW:
-            targetAttr = Story.NODES.MEDIA.SETTING; break;
-          case Story.NODES.TYPES.TAG:
-            targetAttr = Story.NODES.MEDIA.TAG_POSITION; break;
-          case Story.EDGES.TYPES.TRANSITION:
-            targetAttr = Story.NODES.MEDIA.TRANSITION_TAG; break;
-          }
-
-          if (nodeType == Story.NODES.TYPES.TAG ||
-              nodeType == Story.EDGES.TYPES.TRANSITION) {
-            if (!cones.search(id)) {
-              cones.createFromMeta(story.getTags(id)[0]);
-              cones.adjustSizes(getCameraPosition());
-            }
-            console.log('selecting', id);
-            selectTag(id);
-            $currTagButton.prop('disabled',false);
-          } else {
-            $currTagButton.prop('disabled',true);
-            tagInFocus = null;
-            show(id);
-          }
+          selectEntity(id);
         }
         break;
       }
+    };
+
+    var selectEntity = function (id) {
+      id = id || selection;
+
+      if (!id) {
+        return;
+      }
+      var nodeType = story.getEntityType(id);
+
+      switch (nodeType) {
+      case Story.NODES.TYPES.VIEW:
+        targetAttr = Story.NODES.MEDIA.SETTING; break;
+      case Story.NODES.TYPES.TAG:
+        targetAttr = Story.NODES.MEDIA.TAG_POSITION; break;
+      case Story.EDGES.TYPES.TRANSITION:
+        targetAttr = Story.NODES.MEDIA.TRANSITION_TAG; break;
+      }
+
+      if (nodeType == Story.NODES.TYPES.TAG ||
+          nodeType == Story.EDGES.TYPES.TRANSITION) {
+        var data = story.getTags(id)[0];
+        if (data.position && conf.regex.tag.test(data.position)) {
+          var curr = cones.search(id);
+          if (curr) {
+            cones.deleteCone(curr.getId());
+          }
+          
+          cones.createFromMeta(data);
+          cones.adjustSizes(getCameraPosition());
+        }
+        console.log('selecting', id);
+        selectTag(id);
+        $currTagButton.prop('disabled',false);
+      } else {
+        $currTagButton.prop('disabled',true);
+        tagInFocus = null;
+      }
+
+      if (nodeType == Story.NODES.TYPES.VIEW) {
+        viewInFocus = id;
+        $currViewButton.prop('disabled',false);
+        
+        var view = story.getView(id);
+        if (view && conf.regex.view.test(view)) {
+          changeView(view);
+        } else {
+          changeView('default');
+        }
+
+      } else {
+        $currViewButton.prop('disabled',true);
+        viewInFocus = null;
+      }
+
+      var isMedia = Story.NODES.TYPES.MEDIA.includes(nodeType);
+      if (isMedia) {
+        show(id);
+      }
+
+      // Important: Update after calling show()
+      selection = id;
     };
 
     var show = function (id) {
@@ -195,36 +233,16 @@ viewer.init = function (eM, m) {
         } 
       }
       
-      if (story.isNode(id)) {
-        var nodeType = story.getNodeType(id);
-        var isMedia = Story.NODES.TYPES.MEDIA.includes(nodeType);
-        if (isMedia) {
-          clearTags();
-          updateTransitionTags(id);
-          updateTags(id);
-          story.setState(id);
-        }
+      clearTags();
+      updateTransitionTags(id);
+      updateTags(id);
+      story.setState(id);
 
-        if ((isMedia || nodeType == Story.NODES.TYPES.VIEW) &&
-            id !== selection) {
-          updateView(id);
-        }
-
-        cones.adjustSizes(getCameraPosition());
-      }
-      
-      var nodeType = story.getEntityType(id);
-
-      if (nodeType == Story.NODES.TYPES.VIEW) {
-        viewInFocus = id;
-        targetAttr = Story.NODES.MEDIA.SETTING;
-        $currViewButton.prop('disabled',false);
-      } else {
-        $currViewButton.prop('disabled',true);
-        viewInFocus = null;
+      if (id !== selection) {
+        updateView(id);
       }
 
-      selection = id;
+      cones.adjustSizes(getCameraPosition());
     }
 
     /**
@@ -255,7 +273,7 @@ viewer.init = function (eM, m) {
       if (changes <= 0) {
         return; 
       }
-      console.log("narrator applies change");
+      console.log("viewer applies change");
       changes--;
       var model = window.y.share.data.get('model');
       story.update(model);
@@ -266,7 +284,7 @@ viewer.init = function (eM, m) {
       console.log(model);
 
       blocker.execute(function () {
-        show();
+        selectEntity();
         console.log('refresh viewer');
       });
     };

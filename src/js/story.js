@@ -269,7 +269,7 @@ Story.prototype.getTags = function (id) {
       title : attr[Story.EDGES.TAG_NAME],
       position : attr[Story.NODES.MEDIA.TRANSITION_TAG],
       description : "",
-      color : "orange",
+      color : conf.viewer.cones.CONE_COLOR_LINK,
       nodeId : id
     }];
   }
