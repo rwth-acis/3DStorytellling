@@ -301,7 +301,7 @@ Story.prototype.getTags = function (id) {
  * @param {bool} mask - only return next steps that filfill the requirements
  * @return {obj} {int:{target:int,name:string}}
  */
-Story.prototype.getStoryTransitions = function (id, mask, hidden) {
+Story.prototype.getStoryTransitions = function (id, mask) {
   var edges = this.getAdjacentEdges(id);
   var res = {};
   

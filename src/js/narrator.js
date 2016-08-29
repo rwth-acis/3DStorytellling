@@ -30,6 +30,7 @@ narrator.init = function (eM) {
         editorMode = eM,
         maskMode = !eM,
         blocker = new util.Blocker(conf.general.refresh_timeout),
+        wasBackClick = false,
 
         _init = function () {
           // IWC
@@ -176,16 +177,12 @@ narrator.init = function (eM) {
           visited.push(entry);
           story.setState(entry);
           story.setStart(entry);
-//          switchTo(entry, false);
-//          iwcClient.sendSelectNode(entry, story.getNodeType(entry));
           display(story.getState());
         } else {
           showNoBegin();
         }
       } else {
         var state = story.getState();
-//        switchTo(entry, false);
-//        iwcClient.sendSelectNode(state, story.getNodeType(state));
         display(story.getState(), true);
       }
 
@@ -194,25 +191,16 @@ narrator.init = function (eM) {
 
     /**
      * Send iwc call to switch story node.
-     * puts current node on the stack
      */
     var switchTo = function (id, toStack) {
-      if (toStack) {
-        var curr = story.getState();
-        path.push(curr);
-        $undo.prop('disabled', false);
-        if (Object.keys(story.getStoryTransitions(curr, true)).length > 1) {
-          forkPath.push(curr);
-          $undo2.prop('disabled', false);
-        }
+      if (!toStack) {
+        wasBackClick = true;
       }
-      
       if (story.isNode(id)) {
         iwcClient.sendSelectNode(id, story.getNodeType(id));
       } else {
         display(id);
       }
-      visited.push(id);
     };
     
     /**
@@ -235,12 +223,25 @@ narrator.init = function (eM) {
      * @param {int} id 
      */
     var display = function (id) {
+
+      var curr = story.getState();
+      if (id != curr && !wasBackClick) {
+        visited.push(id);
+        path.push(curr);
+        $undo.prop('disabled', false);
+        if (Object.keys(story.getStoryTransitions(curr, true)).length > 1) {
+          forkPath.push(curr);
+          $undo2.prop('disabled', false);
+        }
+      }
+      wasBackClick = false;
+
       story.setState(id);
       var next = story.getStoryTransitions(id, (maskMode ? visited : null));
       var num = 0;
       var one = "";
       for (var edgeId in next) {
-        if (!next.hasOwnProperty(edgeId)) {
+        if (!next.hasOwnProperty(edgeId) || !next[edgeId].inViewer) {
           continue;
         }
         
