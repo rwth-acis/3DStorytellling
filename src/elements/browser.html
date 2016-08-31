@@ -265,10 +265,12 @@
          editor: {
              type : Boolean,
              value : false
-         },
+         }
+
      },
 
      ready: function() {
+         this.storydata = [];
          $("toast_fail").attr("fitInto", $("story-browser")[0]);
          browser.init(this.editor);
          $("#list").scrollTarget = this.ownerDocument.documentElement;
@@ -320,6 +322,9 @@
      },
      
      expandResponse: function(e) {
+         if (!this.storydata) {
+            return; 
+         }
          this.storydata = this.storydata.map(function (s) {
              if (!s.hasOwnProperty('name')) {
                  return {name:s, semcheck:false, error:'on noes'};
