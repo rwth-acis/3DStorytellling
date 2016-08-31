@@ -33,7 +33,7 @@ util = {
    */
   embedImage : function (elem, url) {
     if (url) {
-      elem.html('<a href="'+url+'" target="_blank"><div style="width:400px; height:300px; background-size:contain; background-image:url(\''+url+'\'); background-repeat:no-repeat;"></div><a>');
+      elem.html('<a href="'+url+'" target="_blank"><div style="width:84vw; height:300px; background-size:contain; background-position:center; background-image:url(\''+url+'\'); background-repeat:no-repeat;"></div><a>');
     }
   },
 
