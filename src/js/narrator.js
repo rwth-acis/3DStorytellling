@@ -237,7 +237,8 @@ narrator.init = function (eM) {
       wasBackClick = false;
 
       story.setState(id);
-      var next = story.getStoryTransitions(id, (maskMode ? visited : null));
+      var next = story.getStoryTransitions(id, (maskMode ?
+                                                path : null));
       var num = 0;
       var one = "";
       for (var edgeId in next) {
