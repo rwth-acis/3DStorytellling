@@ -124,7 +124,9 @@ narrator.init = function (eM) {
         var data = JSON.parse(payload.data);
         var id = data.selectedEntityId;
         if (Story.NODES.TYPES.MEDIA.includes(story.getEntityType(id))) {
-          display(id);
+          if (story.idNode(id)) {
+            display(id);
+          }
         }
       }
     };
@@ -224,6 +226,10 @@ narrator.init = function (eM) {
      */
     var display = function (id) {
 
+      if (!story.isNode(id)) {
+        return;
+      }
+
       var curr = story.getState();
       if (id != curr && !wasBackClick) {
         visited.push(id);
@@ -299,7 +305,7 @@ narrator.init = function (eM) {
         $cardLinks.append(button);
       }
       
-      $cont.animate({ scrollTop: (0) }, 'slow');
+//      $cont.animate({ scrollTop: (0) }, 'slow');
     };
 
     
