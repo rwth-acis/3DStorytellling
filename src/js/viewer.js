@@ -587,6 +587,7 @@ viewer.init = function (eM, m) {
 
 /**
  * Manages the tags (cones) on an object
+ * @param {jQuery} scene - jQuery object, containing the x3dom scene
  */
 var Cones = function (scene) {
   this.lastCone = null;
@@ -601,10 +602,9 @@ var Cones = function (scene) {
  * @param {string} dir - Surface normal in "x y z"
  * @param {string} color - Color in "r g b"
  * @param {float} size - Size
- * @param {float} transparency - Transparency
  * @return {} generated cone
  */
-Cones.prototype.generateCone = function (author, pos, dir, color, size, transparency) {
+Cones.prototype.generateCone = function (author, pos, dir, color, size) {
   var cone = new Cone(author, pos, dir, color, size, transparency);
   if (!this.cones.hasOwnProperty(cone.getId())) {
     cone.appendToScene(this.$scene);
@@ -768,9 +768,6 @@ Cone.prototype.removeFromScene = function () {
   this.$elem.remove();
 };
 
-/**
- * Removes cone from the scene to which it was added to
- */
 Cone.prototype.scale = function (cam) {
   var scl = this.position.subtract(cam).length()/conf.viewer.cones.CONE_SCALE;
   this.$elem.attr('scale', scl+' '+scl*2+' '+scl);

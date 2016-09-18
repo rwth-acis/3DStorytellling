@@ -34,6 +34,17 @@ browser.init = function (eM) {
 
         _init = function () {
           window.y = y;
+
+
+          console.log('undo', y.share.undo);
+          console.log('redo', y.share.redo);
+          console.log('join', y.share.join);
+          console.log('canvas', y.share.canvas);
+          console.log('nodes', y.share.nodes);
+          console.log('edges', y.share.edges);
+          console.log('select', y.share.select);
+          console.log('data', y.share.data);
+          console.log('text', y.share.text);
           
           if (editorMode) {
             syncmeta.init(y);
